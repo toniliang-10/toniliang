@@ -7,7 +7,12 @@ export default function Home() {
   const [activeCategory, setActiveCategory] = useState<keyof typeof skillsData>("programming");
 
   const getLevelColor = (level: number) => {
-    return "from-blue-700 to-blue-900";
+    if (level >= 90) return "from-green-400 to-green-600";
+    if (level >= 80) return "from-green-400 to-green-600";
+    if (level >= 70) return "from-green-400 to-green-600";
+    if (level >= 60) return "from-green-400 to-green-600";
+    if (level >= 50) return "from-green-400 to-green-600";
+    return "from-green-400 to-green-600";
   };
   return (
     <div className="min-h-screen bg-white">
@@ -18,7 +23,7 @@ export default function Home() {
             <li>
               <a 
                 href="#about" 
-                className="text-gray-700 hover:text-blue-700 font-medium transition-colors"
+                className="text-gray-700 hover:text-purple-600 font-medium transition-colors"
               >
                 About
               </a>
@@ -26,7 +31,7 @@ export default function Home() {
             <li>
               <a 
                 href="#education" 
-                className="text-gray-700 hover:text-blue-700 font-medium transition-colors"
+                className="text-gray-700 hover:text-purple-600 font-medium transition-colors"
               >
                 Education
               </a>
@@ -34,7 +39,7 @@ export default function Home() {
             <li>
               <a 
                 href="#skills" 
-                className="text-gray-700 hover:text-blue-700 font-medium transition-colors"
+                className="text-gray-700 hover:text-purple-600 font-medium transition-colors"
               >
                 Skills
               </a>
@@ -42,7 +47,7 @@ export default function Home() {
             <li>
               <a 
                 href="#experience" 
-                className="text-gray-700 hover:text-blue-700 font-medium transition-colors"
+                className="text-gray-700 hover:text-purple-600 font-medium transition-colors"
               >
                 Experience
               </a>
@@ -50,7 +55,7 @@ export default function Home() {
             <li>
               <a 
                 href="#contact" 
-                className="text-gray-700 hover:text-blue-700 font-medium transition-colors"
+                className="text-gray-700 hover:text-purple-600 font-medium transition-colors"
               >
                 Contact
               </a>
@@ -108,7 +113,7 @@ export default function Home() {
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               Education
             </h2>
-            <div className="w-20 h-1 bg-blue-700 mx-auto"></div>
+            <div className="w-20 h-1 bg-gradient-to-r from-purple-500 to-pink-500 mx-auto"></div>
           </div>
           
           <div className="max-w-3xl mx-auto">
@@ -151,7 +156,7 @@ export default function Home() {
                     </p>
                   </div>
                   
-                  <button className="bg-blue-700 hover:bg-blue-800 text-white font-semibold py-2 px-5 rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg text-sm">
+                  <button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-2 px-5 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg text-sm">
                     Relevant Coursework
                   </button>
                 </div>
@@ -172,9 +177,9 @@ export default function Home() {
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
               Skills & Expertise
             </h2>
-            <div className="w-24 h-1 bg-blue-700 mx-auto mb-6"></div>
+            <div className="w-24 h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 mx-auto mb-6"></div>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Explore my technical skills across different categories with interactive proficiency levels
+              Explore my technical skills across different categories proficiency levels
             </p>
           </div>
 
@@ -184,7 +189,7 @@ export default function Home() {
               onClick={() => setActiveCategory("programming")}
               className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 ${
                 activeCategory === "programming"
-                  ? "bg-blue-700 text-white shadow-lg shadow-blue-700/25"
+                  ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg shadow-green-600/25"
                   : "bg-white text-gray-700 hover:bg-gray-100 shadow-md hover:shadow-lg"
               }`}
             >
@@ -194,7 +199,7 @@ export default function Home() {
               onClick={() => setActiveCategory("frameworks")}
               className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 ${
                 activeCategory === "frameworks"
-                  ? "bg-blue-700 text-white shadow-lg shadow-blue-700/25"
+                  ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg shadow-green-600/25"
                   : "bg-white text-gray-700 hover:bg-gray-100 shadow-md hover:shadow-lg"
               }`}
             >
@@ -204,7 +209,7 @@ export default function Home() {
               onClick={() => setActiveCategory("tools")}
               className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 ${
                 activeCategory === "tools"
-                  ? "bg-blue-700 text-white shadow-lg shadow-blue-700/25"
+                  ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg shadow-green-600/25"
                   : "bg-white text-gray-700 hover:bg-gray-100 shadow-md hover:shadow-lg"
               }`}
             >
@@ -226,7 +231,7 @@ export default function Home() {
                 >
                   {/* Skill Name */}
                   <div className="flex justify-between items-center mb-3">
-                    <h3 className="text-sm font-semibold text-gray-900 group-hover:text-blue-700 transition-colors">
+                    <h3 className="text-sm font-semibold text-gray-900 group-hover:text-purple-600 transition-colors">
                       {skill.name}
                     </h3>
                     <span className="text-sm font-bold text-gray-700">
