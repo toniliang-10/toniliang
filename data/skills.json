@@ -1,0 +1,35 @@
+{
+  "programming": [
+    { "name": "Python", "level": 80 },
+    { "name": "JavaScript", "level": 80 },
+    { "name": "TypeScript", "level": 80 },
+    { "name": "Java", "level": 70 },
+    { "name": "C", "level": 60 },
+    { "name": "C++", "level": 40 },
+    { "name": "SQL", "level": 50 },
+    { "name": "HTML", "level": 80 },
+    { "name": "CSS", "level": 80 },
+    { "name": "Haskell", "level": 30 }
+  ],
+  "frameworks": [
+    { "name": "React.js", "level": 80 },
+    { "name": "Next.js", "level": 80 },
+    { "name": "Node.js", "level": 70 },
+    { "name": "Prisma ORM", "level": 50 },
+    { "name": "Express.js", "level": 50 },
+    { "name": "Tailwind CSS", "level": 70 },
+    { "name": "Zod", "level": 50 }
+  ],
+  "tools": [
+    { "name": "MongoDB", "level": 50 },
+    { "name": "PostgreSQL", "level": 50 },
+    { "name": "AWS", "level": 50 },
+    { "name": "Unreal Engine", "level": 70 },
+    { "name": "GitHub", "level": 80 },
+    { "name": "Cursor", "level": 80 },
+    { "name": "Vercel", "level": 30 },
+    { "name": "Figma", "level": 40 },
+    { "name": "Postman", "level": 50 },
+    { "name": "Jest", "level": 40 }
+  ]
+}
