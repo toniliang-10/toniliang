@@ -459,7 +459,7 @@ export default function Home() {
                   <div className="text-center">
                     {/* Stony Brook University logo */}
                      <div className="w-48 h-48 md:w-56 md:h-56 rounded-full flex items-center justify-center mb-3 mx-auto shadow-lg p-6">
-                       <Image src="/SBU-logo.png" alt="SBU Logo" width={280} height={280} className="object-contain" />
+                       <Image src="/sbu-logo.png" alt="SBU Logo" width={280} height={280} className="object-contain" />
                      </div>
                   </div>
                 </div>
