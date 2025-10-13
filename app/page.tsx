@@ -1,7 +1,6 @@
 "use client";
 import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
-import type { CSSProperties } from "react";
 import skillsData from "../data/skills.json";
 import coursesData from "../data/courses.json";
 
@@ -625,13 +624,8 @@ export default function Home() {
                   <div className="mb-2">
                     <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden shadow-inner">
                         <div
-                          className={`h-full bg-gradient-to-r ${getLevelColor(skill.level)} rounded-full transition-all duration-1000 ease-out relative overflow-hidden`}
-                          style={{
-                            width: `${skill.level}%`,
-                            animation: "slideInWidth 1.2s ease-out forwards",
-                            animationDelay: `${index * 100 + 300}ms`,
-                            ["--target-width" as any]: `${skill.level}%`
-                          }}
+                          className={`h-full bg-gradient-to-r ${getLevelColor(skill.level)} rounded-full relative overflow-hidden`}
+                          style={{ width: `${skill.level}%` }}
                         >
                         {/* Animated shimmer effect */}
                         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-20 animate-shimmer"></div>
