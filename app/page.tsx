@@ -253,55 +253,65 @@ export default function Home() {
   };
 
   const renderSkillIcon = (name: string): React.ReactNode => {
-    const slugMap: Record<string, string> = {
-      Python: 'python',
-      JavaScript: 'javascript',
-      TypeScript: 'typescript',
-      Java: 'coffeescript',
-      C: 'c',
-      'C++': 'cplusplus',
-      SQL: 'postgresql',
-      HTML: 'html5',
-      CSS: 'css3',
-      Haskell: 'haskell',
-      'React.js': 'react',
-      'Next.js': 'nextdotjs',
-      'Node.js': 'nodedotjs',
-      'Prisma ORM': 'prisma',
-      'Express.js': 'express',
-      'Tailwind CSS': 'tailwindcss',
-      Zod: 'zod',
-      MongoDB: 'mongodb',
-      PostgreSQL: 'postgresql',
-      AWS: 'amazonaws',
-      'Unreal Engine': 'unrealengine',
-      GitHub: 'github',
-      Cursor: '/cursor-local',
-      Vercel: 'vercel',
-      Figma: 'figma',
-      Postman: 'postman',
-      Jest: 'jest',
+    // Prefer colored Devicon icons
+    const deviconSlug: Record<string, string> = {
+      Python: 'python/python-original.svg',
+      JavaScript: 'javascript/javascript-original.svg',
+      TypeScript: 'typescript/typescript-original.svg',
+      Java: 'java/java-original.svg',
+      C: 'c/c-original.svg',
+      'C++': 'cplusplus/cplusplus-original.svg',
+      SQL: 'postgresql/postgresql-original.svg',
+      HTML: 'html5/html5-original.svg',
+      CSS: 'css3/css3-original.svg',
+      Haskell: 'haskell/haskell-original.svg',
+      'React.js': 'react/react-original.svg',
+      'Next.js': 'nextjs/nextjs-original.svg',
+      'Node.js': 'nodejs/nodejs-original.svg',
+      'Prisma ORM': 'prisma/prisma-original.svg',
+      'Express.js': 'express/express-original.svg',
+      'Tailwind CSS': 'tailwindcss/tailwindcss-original.svg',
+      Zod: '/local-zod',
+      MongoDB: 'mongodb/mongodb-original.svg',
+      PostgreSQL: 'postgresql/postgresql-original.svg',
+      AWS: 'amazonwebservices/amazonwebservices-original-wordmark.svg',
+      'Unreal Engine': 'unrealengine/unrealengine-original.svg',
+      GitHub: 'github/github-original.svg',
+      Cursor: '/local-cursor',
+      Vercel: 'vercel/vercel-original.svg',
+      Figma: 'figma/figma-original.svg',
+      Postman: 'postman/postman-original.svg',
+      Jest: 'jest/jest-plain.svg',
     };
-    const slug = slugMap[name];
+
+    const slug = deviconSlug[name];
     if (slug) {
-      // Local override for Cursor icon
-      if (slug === '/cursor-local') {
+      if (slug === '/local-cursor') {
         return (
           <span className="inline-flex items-center justify-center w-7 h-7 rounded-md bg-white">
-            <img src="/cursor.svg" alt="Cursor logo" className="w-5 h-5 opacity-90 grayscale" />
+            <img src="/cursor.svg" alt="Cursor logo" className="w-5 h-5" />
+          </span>
+        );
+      }
+      if (slug === '/local-zod') {
+        return (
+          <span className="inline-flex items-center justify-center w-7 h-7 rounded-md bg-white">
+            <img src="/zod.svg" alt="Zod logo" className="w-5 h-5" />
           </span>
         );
       }
       return (
         <span className="inline-flex items-center justify-center w-7 h-7 rounded-md bg-white">
           <img
-            src={`https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/${slug}.svg`}
+            src={`https://cdn.jsdelivr.net/gh/devicons/devicon/icons/${slug}`}
             alt={`${name} logo`}
-            className="w-5 h-5 opacity-90"
+            className="w-5 h-5"
           />
         </span>
       );
     }
+
+    // Fallback: initials badge
     return (
       <span className="inline-flex items-center justify-center w-7 h-7 rounded-md bg-gray-100 text-gray-700 text-sm">
         {name.slice(0, 2).toUpperCase()}
