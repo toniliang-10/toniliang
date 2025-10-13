@@ -804,7 +804,7 @@ export default function Home() {
                     </div>
                     <div>
                       <p className="text-gray-600 text-sm">Location</p>
-                      <p className="text-gray-900 font-semibold">Stony Brook, NY</p>
+                      <p className="text-gray-900 font-semibold">New York, NY</p>
                     </div>
                   </div>
                   <div className="flex items-center space-x-4">
