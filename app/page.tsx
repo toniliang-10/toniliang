@@ -276,7 +276,7 @@ export default function Home() {
       AWS: 'amazonaws',
       'Unreal Engine': 'unrealengine',
       GitHub: 'github',
-      Cursor: 'cursor',
+      Cursor: '/cursor-local',
       Vercel: 'vercel',
       Figma: 'figma',
       Postman: 'postman',
@@ -284,6 +284,14 @@ export default function Home() {
     };
     const slug = slugMap[name];
     if (slug) {
+      // Local override for Cursor icon
+      if (slug === '/cursor-local') {
+        return (
+          <span className="inline-flex items-center justify-center w-7 h-7 rounded-md bg-white">
+            <img src="/cursor.svg" alt="Cursor logo" className="w-5 h-5 opacity-90 grayscale" />
+          </span>
+        );
+      }
       return (
         <span className="inline-flex items-center justify-center w-7 h-7 rounded-md bg-white">
           <img
