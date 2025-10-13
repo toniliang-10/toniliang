@@ -267,10 +267,147 @@ export default function Home() {
 
 
 
-      {/* Experience Section - Placeholder */}
-      <section id="experience" className="min-h-screen flex items-center">
-        <div className="max-w-7xl mx-auto px-6 py-16 w-full">
-          {/* Content will be added later */}
+      {/* Experience Section */}
+      <section id="experience" className="py-20 bg-gradient-to-br from-slate-50 via-indigo-50 to-purple-50">
+        <div className="max-w-6xl mx-auto px-6 w-full">
+          {/* Section Header */}
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              Experience
+            </h2>
+            <div className="w-24 h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 mx-auto mb-6"></div>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              My journey of growth, learning, and making a difference
+            </p>
+          </div>
+
+          {/* Timeline */}
+          <div className="relative">
+            {/* Timeline Line */}
+            <div className="absolute left-1/2 transform -translate-x-1/2 w-1 h-full bg-gradient-to-b from-indigo-400 via-purple-400 to-pink-400 rounded-full animate-timeline-flow"></div>
+
+            {/* Timeline Items */}
+            <div className="space-y-20">
+              {/* Experience 1 */}
+              <div className="relative flex items-center animate-timeline-slide-right" style={{animationDelay: '0.2s'}}>
+                {/* Timeline Dot */}
+                <div className="absolute left-1/2 transform -translate-x-1/2 w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full border-4 border-white shadow-xl z-10 animate-timeline-dot ml-4"></div>
+                
+                {/* Content */}
+                <div className="w-5/12 ml-auto pr-8">
+                  <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 hover:scale-105 border border-indigo-100">
+                    <div className="flex items-center mb-6">
+                      <div className="w-16 h-16 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg animate-icon-float">
+                        🎮
+                      </div>
+                      <div className="ml-6">
+                        <h3 className="text-2xl font-bold text-gray-900 mb-1">Game Developer Intern & Researcher</h3>
+                        <p className="text-indigo-600 font-semibold text-lg">Limbitless Solutions @ UCF</p>
+                        <p className="text-gray-500">Orlando, FL • May 2025 - July 2025</p>
+                      </div>
+                    </div>
+                    <div className="space-y-4">
+                      <p className="text-gray-700 leading-relaxed text-lg">
+                        At Limbitless Solutions I helped build a prosthetic training game in Unreal Engine and C++ for kids with limb differences, making prosthetic training more fun.
+                      </p>
+                      <p className="text-gray-700 leading-relaxed text-lg">
+                        The game was built on top of numerous research data of best practices, using electromyography (EMG) controls and testing with 20+ proxy volunteers to help decrease the rates of prosthetic abandonment. At the end, I got to publish my own paper.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Experience 2 */}
+              <div className="relative flex items-center animate-timeline-slide-left" style={{animationDelay: '0.4s'}}>
+                {/* Timeline Dot */}
+                <div className="absolute left-1/2 transform -translate-x-1/2 w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full border-4 border-white shadow-xl z-10 animate-timeline-dot ml-4"></div>
+                
+                {/* Content */}
+                <div className="w-5/12 mr-auto pl-8">
+                  <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 hover:scale-105 border border-purple-100">
+                    <div className="flex items-center mb-6">
+                      <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg animate-icon-float">
+                        📚
+                      </div>
+                      <div className="ml-6">
+                        <h3 className="text-2xl font-bold text-gray-900 mb-1">Data Structures & Algorithms TA</h3>
+                        <p className="text-purple-600 font-semibold text-lg">Stony Brook University</p>
+                        <p className="text-gray-500">Stony Brook, NY • Jan 2024 - Present</p>
+                      </div>
+                    </div>
+                    <div className="space-y-4">
+                      <p className="text-gray-700 leading-relaxed text-lg">
+                        Every week I guide students through data structures and algorithms, breaking down tough problems and showing best practices of how to solve them.
+                      </p>
+                      <p className="text-gray-700 leading-relaxed text-lg">
+                        I have written over 100 practice problems (LeetCode style), and ran recitations for over 60 students to support them on these fundamental concepts of CS.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Experience 3 */}
+              <div className="relative flex items-center animate-timeline-slide-right" style={{animationDelay: '0.6s'}}>
+                {/* Timeline Dot */}
+                <div className="absolute left-1/2 transform -translate-x-1/2 w-8 h-8 bg-gradient-to-r from-pink-500 to-rose-500 rounded-full border-4 border-white shadow-xl z-10 animate-timeline-dot  ml-4"></div>
+                
+                {/* Content */}
+                <div className="w-5/12 ml-auto pr-8">
+                  <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 hover:scale-105 border border-pink-100">
+                    <div className="flex items-center mb-6">
+                      <div className="w-16 h-16 bg-gradient-to-r from-pink-500 to-rose-500 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg animate-icon-float">
+                        ∫
+                      </div>
+                      <div className="ml-6">
+                        <h3 className="text-2xl font-bold text-gray-900 mb-1">Calculus IV Teaching Assistant</h3>
+                        <p className="text-pink-600 font-semibold text-lg">Stony Brook University</p>
+                        <p className="text-gray-500">Stony Brook, NY • August 2024 - Dec 2024</p>
+                      </div>
+                    </div>
+                    <div className="space-y-4">
+                      <p className="text-gray-700 leading-relaxed text-lg">
+                        Every week, I held office hours to to help students grasp systems of differential equations.
+                        Analyzing and understanding applied differential equations can feel intimidating, so I helped
+                        conceptualize problems and analyze patterns that emerge in these problems.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Experience 4 */}
+              <div className="relative flex items-center animate-timeline-slide-left" style={{animationDelay: '0.8s'}}>
+                {/* Timeline Dot */}
+                <div className="absolute left-1/2 transform -translate-x-1/2 w-8 h-8 bg-gradient-to-r from-rose-500 to-red-500 rounded-full border-4 border-white shadow-xl z-10 animate-timeline-dot ml-4"></div>
+                
+                {/* Content */}
+                <div className="w-5/12 mr-auto pl-8">
+                  <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 hover:scale-105 border border-rose-100">
+                    <div className="flex items-center mb-6">
+                      <div className="w-16 h-16 bg-gradient-to-r from-rose-500 to-red-500 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg animate-icon-float">
+                        👥
+                      </div>
+                      <div className="ml-6">
+                        <h3 className="text-2xl font-bold text-gray-900 mb-1">VP of Web Development Club</h3>
+                        <p className="text-rose-600 font-semibold text-lg">Stony Brook University</p>
+                        <p className="text-gray-500">Stony Brook, NY • Aug 2023 - May 2024</p>
+                      </div>
+                    </div>
+                    <div className="space-y-4">
+                      <p className="text-gray-700 leading-relaxed text-lg">
+                        As VP of the Web Development Club I coordinated our five-person board, built hands-on workshops, and lifted event turnout by 20%.
+                      </p>
+                      <p className="text-gray-700 leading-relaxed text-lg">
+                        Mentoring 30+ students through their first sites taught me that leadership is simply giving people the space and resources to shine.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
