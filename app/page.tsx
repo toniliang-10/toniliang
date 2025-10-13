@@ -250,7 +250,7 @@ export default function Home() {
       
       setSubmitStatus("success");
       setFormData({ email: "", message: "" });
-    } catch (error) {
+    } catch (_err) {
       setSubmitStatus("error");
     } finally {
       setIsSubmitting(false);
@@ -303,6 +303,7 @@ export default function Home() {
       if (slug === '/local-cursor') {
         return (
           <span className="inline-flex items-center justify-center w-7 h-7 rounded-md bg-white">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/cursor.svg" alt="Cursor logo" className="w-5 h-5" />
           </span>
         );
@@ -310,6 +311,7 @@ export default function Home() {
       if (slug === '/local-zod') {
         return (
           <span className="inline-flex items-center justify-center w-7 h-7 rounded-md bg-white">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/zod.svg" alt="Zod logo" className="w-5 h-5" />
           </span>
         );
@@ -485,7 +487,7 @@ export default function Home() {
                       <span className="font-semibold">GPA:</span> 3.64/4.0
                     </p>
                     <p className="text-base text-gray-700">
-                      <span className="font-semibold">Dean's list all Semesters</span>
+                      <span className="font-semibold">Dean&apos;s list all Semesters</span>
                     </p>
                   </div>
                   
