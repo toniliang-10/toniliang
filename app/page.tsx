@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
+import type { CSSProperties } from "react";
 import skillsData from "../data/skills.json";
 import coursesData from "../data/courses.json";
 
@@ -20,6 +21,20 @@ const GeometricAnimation = () => {
     rotation: number;
     rotationSpeed: number;
   }>>([]);
+
+  // Type for geometric particles
+  type Particle = {
+    x: number;
+    y: number;
+    vx: number;
+    vy: number;
+    size: number;
+    color: string;
+    opacity: number;
+    shape: 'circle' | 'square' | 'triangle';
+    rotation: number;
+    rotationSpeed: number;
+  };
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -82,7 +97,7 @@ const GeometricAnimation = () => {
     canvas.addEventListener('mousemove', handleMouseMove);
 
     // Draw geometric shapes
-    const drawShape = (ctx: CanvasRenderingContext2D, particle: any) => {
+    const drawShape = (ctx: CanvasRenderingContext2D, particle: Particle) => {
       ctx.save();
       ctx.translate(particle.x, particle.y);
       ctx.rotate(particle.rotation);
@@ -302,6 +317,7 @@ export default function Home() {
       }
       return (
         <span className="inline-flex items-center justify-center w-7 h-7 rounded-md bg-white">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={`https://cdn.jsdelivr.net/gh/devicons/devicon/icons/${slug}`}
             alt={`${name} logo`}
@@ -515,7 +531,7 @@ export default function Home() {
               {/* List */}
               <div className="p-4">
                   <ul className="divide-y divide-gray-200">
-                    {(activeCourseTab === 'CS' ? coursesData.cs : coursesData.ams).map((course: any) => (
+                  {(activeCourseTab === 'CS' ? coursesData.cs : coursesData.ams).map((course: { code: string; title: string }) => (
                     <li key={course.code} className="py-2 flex items-center justify-between">
                       <span className="font-semibold text-gray-900">{course.code}</span>
                       <span className="text-gray-700">{course.title}</span>
@@ -792,7 +808,7 @@ export default function Home() {
             </h2>
             <div className="w-24 h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 mx-auto mb-6"></div>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Have a project in mind or want to collaborate? I'd love to hear from you!
+              Have a project in mind or want to collaborate? I&apos;d love to hear from you!
             </p>
           </div>
 
@@ -800,7 +816,7 @@ export default function Home() {
             {/* Contact Info */}
             <div className="space-y-8">
               <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-blue-100">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">Let's Connect</h3>
+                <h3 className="text-2xl font-bold text-gray-900 mb-6">Let&apos;s Connect</h3>
                 <div className="space-y-6">
                   <div className="flex items-center space-x-4">
                     <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
@@ -893,7 +909,7 @@ export default function Home() {
                 {submitStatus === "success" && (
                   <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
                     <p className="text-green-700 text-sm font-medium">
-                      ✅ Message sent successfully! I'll get back to you soon.
+                      ✅ Message sent successfully! I&apos;ll get back to you soon.
                     </p>
                   </div>
                 )}
