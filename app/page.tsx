@@ -251,6 +251,55 @@ export default function Home() {
     if (level >= 50) return "from-green-400 to-green-600";
     return "from-green-400 to-green-600";
   };
+
+  const renderSkillIcon = (name: string): React.ReactNode => {
+    const slugMap: Record<string, string> = {
+      Python: 'python',
+      JavaScript: 'javascript',
+      TypeScript: 'typescript',
+      Java: 'coffeescript',
+      C: 'c',
+      'C++': 'cplusplus',
+      SQL: 'postgresql',
+      HTML: 'html5',
+      CSS: 'css3',
+      Haskell: 'haskell',
+      'React.js': 'react',
+      'Next.js': 'nextdotjs',
+      'Node.js': 'nodedotjs',
+      'Prisma ORM': 'prisma',
+      'Express.js': 'express',
+      'Tailwind CSS': 'tailwindcss',
+      Zod: 'zod',
+      MongoDB: 'mongodb',
+      PostgreSQL: 'postgresql',
+      AWS: 'amazonaws',
+      'Unreal Engine': 'unrealengine',
+      GitHub: 'github',
+      Cursor: 'cursor',
+      Vercel: 'vercel',
+      Figma: 'figma',
+      Postman: 'postman',
+      Jest: 'jest',
+    };
+    const slug = slugMap[name];
+    if (slug) {
+      return (
+        <span className="inline-flex items-center justify-center w-7 h-7 rounded-md bg-white">
+          <img
+            src={`https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/${slug}.svg`}
+            alt={`${name} logo`}
+            className="w-5 h-5 opacity-90"
+          />
+        </span>
+      );
+    }
+    return (
+      <span className="inline-flex items-center justify-center w-7 h-7 rounded-md bg-gray-100 text-gray-700 text-sm">
+        {name.slice(0, 2).toUpperCase()}
+      </span>
+    );
+  };
   return (
     <div className="min-h-screen bg-white">
       {/* Navigation Bar */}
@@ -527,9 +576,12 @@ export default function Home() {
                 >
                   {/* Skill Name */}
                   <div className="flex justify-between items-center mb-3">
-                    <h3 className="text-sm font-semibold text-gray-900 group-hover:text-purple-600 transition-colors">
-                      {skill.name}
-                    </h3>
+                    <div className="flex items-center gap-2">
+                      {renderSkillIcon(skill.name)}
+                      <h3 className="text-sm font-semibold text-gray-900 group-hover:text-purple-600 transition-colors">
+                        {skill.name}
+                      </h3>
+                    </div>
                     <span className="text-sm font-bold text-gray-700">
                       {skill.level}%
                     </span>
