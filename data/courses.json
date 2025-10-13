@@ -1,0 +1,29 @@
+{
+  "cs": [
+    { "code": "CSE 114", "title": "Object-Oriented Prog" },
+    { "code": "CSE 214", "title": "Data Structures" },
+    { "code": "CSE 215", "title": "Foundations of Comp Science" },
+    { "code": "CSE 216", "title": "Programming Abstractions" },
+    { "code": "CSE 220", "title": "Systems Fundamentals I" },
+    { "code": "CSE 303", "title": "Intro to Theory of Computation" },
+    { "code": "CSE 312", "title": "Legal Issues in Computing" },
+    { "code": "CSE 316", "title": "Software Development" },
+    { "code": "CSE 320", "title": "Systems Fundamentals II" },
+    { "code": "CSE 351", "title": "Introduction to Data Science" },
+    { "code": "CSE 355", "title": "Computational Geometry" },
+    { "code": "CSE 416", "title": "Software Engineering" }
+  ],
+  "ams": [
+    { "code": "MAT 131", "title": "Calculus I" },
+    { "code": "MAT 132", "title": "Calculus II" },
+    { "code": "MAT 203", "title": "Calculus III: Multivariable Calculus" },
+    { "code": "AMS 210", "title": "Linear Algebra" },
+    { "code": "AMS 301", "title": "Finite Mathematical Structures" },
+    { "code": "AMS 310", "title": "Probability and Statistics" },
+    { "code": "AMS 326", "title": "Numerical Analysis" },
+    { "code": "AMS 333", "title": "Mathematical Biology" },
+    { "code": "AMS 345", "title": "Computational Geometry" },
+    { "code": "AMS 361", "title": "Calculus IV: Differential Equations" }
+  ]
+}
+

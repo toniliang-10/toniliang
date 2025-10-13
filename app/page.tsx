@@ -1,7 +1,205 @@
 "use client";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import skillsData from "../data/skills.json";
+import coursesData from "../data/courses.json";
+
+// Geometric Particle Animation Component
+const GeometricAnimation = () => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const mouseRef = useRef({ x: 0, y: 0 });
+  const particlesRef = useRef<Array<{
+    x: number;
+    y: number;
+    vx: number;
+    vy: number;
+    size: number;
+    color: string;
+    opacity: number;
+    shape: 'circle' | 'square' | 'triangle';
+    rotation: number;
+    rotationSpeed: number;
+  }>>([]);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Set canvas size
+    const resizeCanvas = () => {
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+    };
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    // Initialize particles
+    const initParticles = () => {
+      particlesRef.current = [];
+      const colors = [
+        'rgba(59, 130, 246, 0.8)', // blue-500
+        'rgba(37, 99, 235, 0.8)',  // blue-600
+        'rgba(16, 185, 129, 0.8)', // emerald-500
+        'rgba(5, 150, 105, 0.8)',  // emerald-600
+        'rgba(99, 102, 241, 0.8)', // indigo-500
+        'rgba(79, 70, 229, 0.8)',  // indigo-600
+        'rgba(34, 197, 94, 0.8)',  // green-500
+        'rgba(22, 163, 74, 0.8)',  // green-600
+        'rgba(168, 85, 247, 0.8)', // purple-500
+        'rgba(147, 51, 234, 0.8)', // purple-600
+      ];
+
+      for (let i = 0; i < 25; i++) {
+        particlesRef.current.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          vx: (Math.random() - 0.5) * 1.5,
+          vy: (Math.random() - 0.5) * 1.5,
+          size: Math.random() * 8 + 4,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          opacity: Math.random() * 0.6 + 0.4,
+          shape: ['circle', 'square', 'triangle'][Math.floor(Math.random() * 3)] as 'circle' | 'square' | 'triangle',
+          rotation: Math.random() * Math.PI * 2,
+          rotationSpeed: (Math.random() - 0.5) * 0.05,
+        });
+      }
+    };
+
+    initParticles();
+
+    // Mouse move handler
+    const handleMouseMove = (e: MouseEvent) => {
+      const rect = canvas.getBoundingClientRect();
+      mouseRef.current = {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top,
+      };
+    };
+
+    canvas.addEventListener('mousemove', handleMouseMove);
+
+    // Draw geometric shapes
+    const drawShape = (ctx: CanvasRenderingContext2D, particle: any) => {
+      ctx.save();
+      ctx.translate(particle.x, particle.y);
+      ctx.rotate(particle.rotation);
+      ctx.globalAlpha = particle.opacity;
+      ctx.fillStyle = particle.color;
+      ctx.strokeStyle = particle.color;
+      ctx.lineWidth = 2;
+
+      switch (particle.shape) {
+        case 'circle':
+          ctx.beginPath();
+          ctx.arc(0, 0, particle.size / 2, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+          break;
+        case 'square':
+          ctx.fillRect(-particle.size / 2, -particle.size / 2, particle.size, particle.size);
+          ctx.strokeRect(-particle.size / 2, -particle.size / 2, particle.size, particle.size);
+          break;
+        case 'triangle':
+          ctx.beginPath();
+          ctx.moveTo(0, -particle.size / 2);
+          ctx.lineTo(-particle.size / 2, particle.size / 2);
+          ctx.lineTo(particle.size / 2, particle.size / 2);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+          break;
+      }
+      ctx.restore();
+    };
+
+    // Draw connecting lines
+    const drawConnections = (ctx: CanvasRenderingContext2D) => {
+      const particles = particlesRef.current;
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          
+          if (distance < 120) {
+            const opacity = (120 - distance) / 120 * 0.3;
+            ctx.save();
+            ctx.globalAlpha = opacity;
+            ctx.strokeStyle = particles[i].color;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.stroke();
+            ctx.restore();
+          }
+        }
+      }
+    };
+
+    // Animation loop
+    const animate = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      particlesRef.current.forEach((particle) => {
+        // Mouse interaction
+        const dx = mouseRef.current.x - particle.x;
+        const dy = mouseRef.current.y - particle.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        const maxDistance = 100;
+
+        if (distance < maxDistance && distance > 0) {
+          const force = (maxDistance - distance) / maxDistance;
+          const angle = Math.atan2(dy, dx);
+          particle.vx -= Math.cos(angle) * force * 0.3;
+          particle.vy -= Math.sin(angle) * force * 0.3;
+        }
+
+        // Update position
+        particle.x += particle.vx;
+        particle.y += particle.vy;
+        particle.rotation += particle.rotationSpeed;
+
+        // Boundary collision with wrap-around
+        if (particle.x < 0) particle.x = canvas.width;
+        if (particle.x > canvas.width) particle.x = 0;
+        if (particle.y < 0) particle.y = canvas.height;
+        if (particle.y > canvas.height) particle.y = 0;
+
+        // Friction
+        particle.vx *= 0.99;
+        particle.vy *= 0.99;
+
+        // Draw particle
+        drawShape(ctx, particle);
+      });
+
+      // Draw connections
+      drawConnections(ctx);
+
+      requestAnimationFrame(animate);
+    };
+
+    animate();
+
+    return () => {
+      window.removeEventListener('resize', resizeCanvas);
+      canvas.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="absolute inset-0 w-full h-full pointer-events-auto"
+      style={{ zIndex: 1 }}
+    />
+  );
+};
+
 
 export default function Home() {
   const [activeCategory, setActiveCategory] = useState<keyof typeof skillsData>("programming");
@@ -11,6 +209,8 @@ export default function Home() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
+  const [showCourses, setShowCourses] = useState(false);
+  const [activeCourseTab, setActiveCourseTab] = useState<'CS' | 'AMS'>('CS');
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -60,7 +260,7 @@ export default function Home() {
             <li>
               <a 
                 href="#about" 
-                className="text-gray-700 hover:text-purple-600 font-medium transition-colors"
+                className="text-gray-700 hover:text-purple-600 font-medium transition-colors hover:underline underline-offset-4 decoration-2 decoration-purple-600"
               >
                 About
               </a>
@@ -68,7 +268,7 @@ export default function Home() {
             <li>
               <a 
                 href="#education" 
-                className="text-gray-700 hover:text-purple-600 font-medium transition-colors"
+                className="text-gray-700 hover:text-purple-600 font-medium transition-colors hover:underline underline-offset-4 decoration-2 decoration-purple-600"
               >
                 Education
               </a>
@@ -76,7 +276,7 @@ export default function Home() {
             <li>
               <a 
                 href="#skills" 
-                className="text-gray-700 hover:text-purple-600 font-medium transition-colors"
+                className="text-gray-700 hover:text-purple-600 font-medium transition-colors hover:underline underline-offset-4 decoration-2 decoration-purple-600"
               >
                 Skills
               </a>
@@ -84,7 +284,7 @@ export default function Home() {
             <li>
               <a 
                 href="#experience" 
-                className="text-gray-700 hover:text-purple-600 font-medium transition-colors"
+                className="text-gray-700 hover:text-purple-600 font-medium transition-colors hover:underline underline-offset-4 decoration-2 decoration-purple-600"
               >
                 Experience
               </a>
@@ -92,7 +292,7 @@ export default function Home() {
             <li>
               <a 
                 href="#contact" 
-                className="text-gray-700 hover:text-purple-600 font-medium transition-colors"
+                className="text-gray-700 hover:text-purple-600 font-medium transition-colors hover:underline underline-offset-4 decoration-2 decoration-purple-600"
               >
                 Contact
               </a>
@@ -105,9 +305,9 @@ export default function Home() {
 
 
       {/* About Section */}
-      <section id="about" className="min-h-screen flex items-center pt-20">
+      <section id="about" className="min-h-screen flex items-center pt-20 relative overflow-hidden bg-gradient-to-br from-gray-100 via-slate-200 to-gray-300">
         <div className="max-w-7xl mx-auto px-6 py-16 w-full">
-          <div className="flex flex-col md:flex-row items-center gap-12 md:gap-16 mb-80 ml-40 mr-40">
+          <div className="flex flex-col md:flex-row items-center gap-12 md:gap-16 mb-20 ml-40 mr-40 relative z-10">
             {/* Left Container - Photo */}
             <div className="flex-shrink-0 ">
               <div className="relative w-64 h-64 md:w-80 md:h-80 rounded-full overflow-hidden shadow-2xl border-4 border-gray-100">
@@ -145,6 +345,11 @@ export default function Home() {
                 </svg>
               </a>
             </div>
+          </div>
+          
+          {/* Geometric Animation Container */}
+          <div className="absolute bottom-0 left-0 right-0 h-80 pointer-events-auto">
+            <GeometricAnimation />
           </div>
         </div>
       </section>
@@ -202,13 +407,58 @@ export default function Home() {
                     </p>
                   </div>
                   
-                  <button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-2 px-5 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg text-sm">
-                    Relevant Coursework
+                  <button
+                    onClick={() => setShowCourses(prev => !prev)}
+                    className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-2 px-5 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg text-sm"
+                  >
+                    {showCourses ? 'Hide Coursework' : 'Relevant Coursework'}
                   </button>
                 </div>
               </div>
             </div>
           </div>
+
+          {/* Coursework Drawer */}
+          {showCourses && (
+            <div className="mt-6 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
+              {/* Tabs */}
+              <div className="flex">
+                <button
+                  onClick={() => setActiveCourseTab('CS')}
+                  className={`flex-1 px-4 py-3 text-sm font-semibold transition-colors ${
+                    activeCourseTab === 'CS'
+                      ? 'text-white bg-gradient-to-r from-indigo-500 to-purple-500'
+                      : 'text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  CS
+                </button>
+                <button
+                  onClick={() => setActiveCourseTab('AMS')}
+                  className={`flex-1 px-4 py-3 text-sm font-semibold transition-colors ${
+                    activeCourseTab === 'AMS'
+                      ? 'text-white bg-gradient-to-r from-indigo-500 to-purple-500'
+                      : 'text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  Applied Math
+                </button>
+              </div>
+
+              {/* List */}
+              <div className="p-4">
+                  <ul className="divide-y divide-gray-200">
+                    {(activeCourseTab === 'CS' ? coursesData.cs : coursesData.ams).map((course: any) => (
+                    <li key={course.code} className="py-2 flex items-center justify-between">
+                      <span className="font-semibold text-gray-900">{course.code}</span>
+                      <span className="text-gray-700">{course.title}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          )}
+
         </div>
       </section>
 
@@ -534,8 +784,8 @@ export default function Home() {
                     value={formData.email}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 bg-white/50 backdrop-blur-sm"
-                    placeholder="your.email@example.com"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 bg-white/50 backdrop-blur-sm placeholder-gray-600"
+                    placeholder="Email"
                   />
                 </div>
 
@@ -550,7 +800,7 @@ export default function Home() {
                     onChange={handleInputChange}
                     required
                     rows={6}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 bg-white/50 backdrop-blur-sm resize-none"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 bg-white/50 backdrop-blur-sm resize-none placeholder-gray-600"
                     placeholder="Tell me about your project or just say hello!"
                   />
                 </div>
