@@ -935,7 +935,7 @@ export default function Home() {
             <div>
               <h3 className="text-xl font-bold mb-4">Toni Liang</h3>
               <p className="text-gray-400 leading-relaxed">
-                Senior Computer Science student at Stony Brook University with a passion for software engineering and creating meaningful digital experiences.
+                Senior Computer Science student at Stony Brook University with a passion for creating software tools with purpose.
               </p>
             </div>
 
@@ -996,7 +996,7 @@ export default function Home() {
                   </svg>
                 </a>
                 <a
-                  href="https://docs.google.com/document/d/1YnWs34AJFzglaY1Aor7s8q7NtUV1O7Sk4kNxz0QE_jQ/edit?tab=t.0"
+                  href="https://docs.google.com/document/d/1GC-fDsrP04xF3k2AfkhoGCNi7lA_be8rU3WhK-X9JoA/edit?tab=t.0"
                   className="w-12 h-12 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 rounded-full flex items-center justify-center transition-all duration-200 transform hover:scale-110 shadow-lg hover:shadow-xl"
                   aria-label="Resume"
                   target="_blank"
