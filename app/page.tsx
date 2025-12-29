@@ -543,7 +543,7 @@ export default function Home() {
 
       {/* Skills Section */}
       <section id="skills" className="py-20 bg-gradient-to-br from-gray-50 to-gray-100">
-        <div className="max-w-7xl mx-auto px-6 w-full">
+        <div className="max-w-7xl mx-auto px-6 w-full mt-20 mb-20">
           {/* Section Header */}
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
@@ -639,7 +639,68 @@ export default function Home() {
 
             {/* Timeline Items */}
             <div className="space-y-20">
+
               {/* Experience 1 */}
+              <div className="relative flex items-center animate-timeline-slide-right" style={{animationDelay: '0.2s'}}>
+                {/* Timeline Dot */}
+                <div className="absolute left-1/2 transform -translate-x-1/2 w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full border-4 border-white shadow-xl z-10 animate-timeline-dot ml-4"></div>
+                
+                {/* Content */}
+                <div className="w-5/12 ml-auto pr-8">
+                  <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 hover:scale-105 border border-indigo-100">
+                    <div className="flex items-center mb-6">
+                      <div className="w-16 h-16 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg animate-icon-float">
+                        💼
+                      </div>
+                      <div className="ml-6">
+                        <h3 className="text-2xl font-bold text-gray-900 mb-1">Backend Software Engineering Intern</h3>
+                        <p className="text-indigo-600 font-semibold text-lg">Springer Capital</p>
+                        <p className="text-gray-500">Remote • December 2025 - Present</p>
+                      </div>
+                    </div>
+                    <div className="space-y-4">
+                      <p className="text-gray-700 leading-relaxed text-lg">
+                        At Springer Capital I finished employer-led training in AI/ML, Azure, Django/DRF, PostgreSQL, and Python. 
+                      </p>
+                      <p className="text-gray-700 leading-relaxed text-lg">
+                        Then, I proposed a RESTful ETL service in Flask with DLT checkpointing so HubSpot deal extractions could restart after failures without losing data.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Experience 2 */}
+              <div className="relative flex items-center animate-timeline-slide-left" style={{animationDelay: '0.4s'}}>
+                {/* Timeline Dot */}
+                <div className="absolute left-1/2 transform -translate-x-1/2 w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full border-4 border-white shadow-xl z-10 animate-timeline-dot ml-4"></div>
+                
+                {/* Content */}
+                <div className="w-5/12 mr-auto pl-8">
+                  <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 hover:scale-105 border border-purple-100">
+                    <div className="flex items-center mb-6">
+                      <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg animate-icon-float">
+                        🤖
+                      </div>
+                      <div className="ml-6">
+                        <h3 className="text-2xl font-bold text-gray-900 mb-1">Contributer</h3>
+                        <p className="text-purple-600 font-semibold text-lg">SnorkelAI</p>
+                        <p className="text-gray-500">Remote • September 2025 - Present</p>
+                      </div>
+                    </div>
+                    <div className="space-y-4">
+                      <p className="text-gray-700 leading-relaxed text-lg">
+                        At SnorkelAI I compared AI-generated code across Python, JavaScript, and TypeScript, grading logic, style, and explanations against user prompts to measure performance.
+                      </p>
+                      <p className="text-gray-700 leading-relaxed text-lg">
+                      I contributed to improving Python repositories by re-prompting models for stronger submissions to large LLM customers, mapping recurring failure patterns when models tried to shortcut accepted solutions.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Experience 3 */}
               <div className="relative flex items-center animate-timeline-slide-right" style={{animationDelay: '0.2s'}}>
                 {/* Timeline Dot */}
                 <div className="absolute left-1/2 transform -translate-x-1/2 w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full border-4 border-white shadow-xl z-10 animate-timeline-dot ml-4"></div>
@@ -662,14 +723,14 @@ export default function Home() {
                         At Limbitless Solutions I helped build a prosthetic training game in Unreal Engine and C++ for kids with limb differences, making prosthetic training more fun.
                       </p>
                       <p className="text-gray-700 leading-relaxed text-lg">
-                        The game was built on top of numerous research data of best practices, using electromyography (EMG) controls and testing with 20+ proxy volunteers to help decrease the rates of prosthetic abandonment. At the end, I got to publish my own paper.
+                        The game was built on top of numerous research data of best practices, using electromyography (EMG) controls to help decrease the rates of prosthetic abandonment.
                       </p>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Experience 2 */}
+              {/* Experience 4 */}
               <div className="relative flex items-center animate-timeline-slide-left" style={{animationDelay: '0.4s'}}>
                 {/* Timeline Dot */}
                 <div className="absolute left-1/2 transform -translate-x-1/2 w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full border-4 border-white shadow-xl z-10 animate-timeline-dot ml-4"></div>
@@ -699,7 +760,7 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Experience 3 */}
+              {/* Experience 5 */}
               <div className="relative flex items-center animate-timeline-slide-right" style={{animationDelay: '0.6s'}}>
                 {/* Timeline Dot */}
                 <div className="absolute left-1/2 transform -translate-x-1/2 w-8 h-8 bg-gradient-to-r from-pink-500 to-rose-500 rounded-full border-4 border-white shadow-xl z-10 animate-timeline-dot  ml-4"></div>
@@ -728,37 +789,7 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Experience 4 */}
-              <div className="relative flex items-center animate-timeline-slide-left" style={{animationDelay: '0.8s'}}>
-                {/* Timeline Dot */}
-                <div className="absolute left-1/2 transform -translate-x-1/2 w-8 h-8 bg-gradient-to-r from-rose-500 to-red-500 rounded-full border-4 border-white shadow-xl z-10 animate-timeline-dot ml-4"></div>
-                
-                {/* Content */}
-                <div className="w-5/12 mr-auto pl-8">
-                  <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 hover:scale-105 border border-rose-100">
-                    <div className="flex items-center mb-6">
-                      <div className="w-16 h-16 bg-gradient-to-r from-rose-500 to-red-500 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg animate-icon-float">
-                        👥
-                      </div>
-                      <div className="ml-6">
-                        <h3 className="text-2xl font-bold text-gray-900 mb-1">VP of Web Development Club</h3>
-                        <p className="text-rose-600 font-semibold text-lg">Stony Brook University</p>
-                        <p className="text-gray-500">Stony Brook, NY • Aug 2023 - May 2024</p>
-                      </div>
-                    </div>
-                    <div className="space-y-4">
-                      <p className="text-gray-700 leading-relaxed text-lg">
-                        During my time as VP, I coordinated our five-person executive board and created content for over 70 members in our club. 
-                        Our team was able to co-create over 30 personal portfolios while teaching the fundamentals of web development.
-                      </p>
-                      <p className="text-gray-700 leading-relaxed text-lg">
-                        On top of teaching, I ran marketting strategies with our e-board to expand our reach to the younger 
-                        generation of developers. Our efforts increased club attendance by 50% within the first month. 
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
+
             </div>
           </div>
         </div>
