@@ -257,15 +257,6 @@ export default function Home() {
     }
   };
 
-  const getLevelColor = (level: number) => {
-    if (level >= 90) return "from-green-400 to-green-600";
-    if (level >= 80) return "from-green-400 to-green-600";
-    if (level >= 70) return "from-green-400 to-green-600";
-    if (level >= 60) return "from-green-400 to-green-600";
-    if (level >= 50) return "from-green-400 to-green-600";
-    return "from-green-400 to-green-600";
-  };
-
   const renderSkillIcon = (name: string): React.ReactNode => {
     // Prefer colored Devicon icons
     const deviconSlug: Record<string, string> = {
@@ -275,6 +266,7 @@ export default function Home() {
       Java: 'java/java-original.svg',
       C: 'c/c-original.svg',
       'C++': 'cplusplus/cplusplus-original.svg',
+      Rust: 'rust/rust-original.svg',
       SQL: 'postgresql/postgresql-original.svg',
       HTML: 'html5/html5-original.svg',
       CSS: 'css3/css3-original.svg',
@@ -417,7 +409,7 @@ export default function Home() {
                 Toni Liang
               </h1>
               <p className="text-xl md:text-2xl text-gray-700 leading-relaxed mb-8">
-                I am a Senior at Stony Brook University and an aspiring software engineer.
+                I am a Senior at Stony Brook University with a passion for building with care and purpose.
               </p>
               <a 
                 href="#education"
@@ -484,7 +476,7 @@ export default function Home() {
                   
                   <div className="border-t pt-3 mb-4">
                     <p className="text-base text-gray-700 mb-1">
-                      <span className="font-semibold">GPA:</span> 3.64/4.0
+                      <span className="font-semibold">GPA:</span> 3.65/4.0
                     </p>
                     <p className="text-base text-gray-700">
                       <span className="font-semibold">Dean&apos;s list all Semesters</span>
@@ -609,30 +601,11 @@ export default function Home() {
                     animation: "fadeInUp 0.6s ease-out forwards"
                   }}
                 >
-                  {/* Skill Name */}
-                  <div className="flex justify-between items-center mb-3">
-                    <div className="flex items-center gap-2">
-                      {renderSkillIcon(skill.name)}
-                      <h3 className="text-sm font-semibold text-gray-900 group-hover:text-purple-600 transition-colors">
-                        {skill.name}
-                      </h3>
-                    </div>
-                    <span className="text-sm font-bold text-gray-700">
-                      {skill.level}%
-                    </span>
-                  </div>
-
-                  {/* Progress Bar */}
-                  <div className="mb-2">
-                    <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden shadow-inner">
-                        <div
-                          className={`h-full bg-gradient-to-r ${getLevelColor(skill.level)} rounded-full relative overflow-hidden`}
-                          style={{ width: `${skill.level}%` }}
-                        >
-                        {/* Animated shimmer effect */}
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-20 animate-shimmer"></div>
-                      </div>
-                    </div>
+                  <div className="flex items-center gap-2">
+                    {renderSkillIcon(skill.name)}
+                    <h3 className="text-sm font-semibold text-gray-900 group-hover:text-purple-600 transition-colors">
+                      {skill.name}
+                    </h3>
                   </div>
                 </div>
               ))}

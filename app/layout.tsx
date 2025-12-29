@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Toni Liang - Portfolio",
-  description: "Senior at Stony Brook University | Aspiring Software Engineer",
+  description: "Senior at Stony Brook University | Building with Care and Passion",
 };
 
 export default function RootLayout({
