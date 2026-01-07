@@ -683,7 +683,7 @@ export default function Home() {
                         🤖
                       </div>
                       <div className="ml-6">
-                        <h3 className="text-2xl font-bold text-gray-900 mb-1">Contributer</h3>
+                        <h3 className="text-2xl font-bold text-gray-900 mb-1">AI Contributor</h3>
                         <p className="text-purple-600 font-semibold text-lg">SnorkelAI</p>
                         <p className="text-gray-500">Remote • September 2025 - Present</p>
                       </div>
