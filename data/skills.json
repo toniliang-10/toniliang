@@ -6,29 +6,47 @@
     { "name": "Java" },
     { "name": "C" },
     { "name": "C++" },
-    { "name": "Rust" },
     { "name": "SQL" },
-    { "name": "Haskell" }
+    { "name": "Ruby" },
+    { "name": "Rust" },
+    { "name": "HTML" },
+    { "name": "CSS" }
   ],
   "frameworks": [
     { "name": "React.js" },
     { "name": "Next.js" },
     { "name": "Node.js" },
-    { "name": "Prisma ORM" },
+    { "name": "Spring Boot" },
+    { "name": "Django" },
+    { "name": "Flask" },
+    { "name": "Prisma" },
     { "name": "Express.js" },
+    { "name": "Angular" },
     { "name": "Tailwind CSS" },
-    { "name": "Zod" }
+    { "name": "FastAPI" },
+    { "name": "Pandas" },
+    { "name": "NumPy" },
+    { "name": "PyTorch" },
+    { "name": "TensorFlow" },
+    { "name": "scikit-learn" },
+    { "name": "SciPy" },
+    { "name": "Matplotlib" },
+    { "name": "XGBoost" }
   ],
   "tools": [
     { "name": "MongoDB" },
     { "name": "PostgreSQL" },
     { "name": "AWS" },
-    { "name": "Unreal Engine" },
-    { "name": "GitHub" },
-    { "name": "Cursor" },
-    { "name": "Vercel" },
-    { "name": "Figma" },
+    { "name": "Docker" },
     { "name": "Postman" },
-    { "name": "Jest" }
+    { "name": "Jest" },
+    { "name": "JUnit" },
+    { "name": "Claude Code" },
+    { "name": "Codex" },
+    { "name": "Cursor" },
+    { "name": "GitHub" },
+    { "name": "DLT" },
+    { "name": "Unreal Engine" },
+    { "name": "Wireshark" }
   ]
 }

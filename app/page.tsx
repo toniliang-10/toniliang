@@ -1,256 +1,167 @@
 "use client";
 import Image from "next/image";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import skillsData from "../data/skills.json";
 import coursesData from "../data/courses.json";
 
-// Geometric Particle Animation Component
-const GeometricAnimation = () => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const mouseRef = useRef({ x: 0, y: 0 });
-  const particlesRef = useRef<Array<{
-    x: number;
-    y: number;
-    vx: number;
-    vy: number;
-    size: number;
-    color: string;
-    opacity: number;
-    shape: 'circle' | 'square' | 'triangle';
-    rotation: number;
-    rotationSpeed: number;
-  }>>([]);
-
-  // Type for geometric particles
-  type Particle = {
-    x: number;
-    y: number;
-    vx: number;
-    vy: number;
-    size: number;
-    color: string;
-    opacity: number;
-    shape: 'circle' | 'square' | 'triangle';
-    rotation: number;
-    rotationSpeed: number;
-  };
-
+/* ------------------------------------------------------------------ */
+/*  Small hook: reveal elements on scroll (respects reduced motion)    */
+/* ------------------------------------------------------------------ */
+function useReveal() {
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    // Set canvas size
-    const resizeCanvas = () => {
-      canvas.width = canvas.offsetWidth;
-      canvas.height = canvas.offsetHeight;
-    };
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
-
-    // Initialize particles
-    const initParticles = () => {
-      particlesRef.current = [];
-      const colors = [
-        'rgba(59, 130, 246, 0.8)', // blue-500
-        'rgba(37, 99, 235, 0.8)',  // blue-600
-        'rgba(16, 185, 129, 0.8)', // emerald-500
-        'rgba(5, 150, 105, 0.8)',  // emerald-600
-        'rgba(99, 102, 241, 0.8)', // indigo-500
-        'rgba(79, 70, 229, 0.8)',  // indigo-600
-        'rgba(34, 197, 94, 0.8)',  // green-500
-        'rgba(22, 163, 74, 0.8)',  // green-600
-        'rgba(168, 85, 247, 0.8)', // purple-500
-        'rgba(147, 51, 234, 0.8)', // purple-600
-      ];
-
-      for (let i = 0; i < 25; i++) {
-        particlesRef.current.push({
-          x: Math.random() * canvas.width,
-          y: Math.random() * canvas.height,
-          vx: (Math.random() - 0.5) * 1.5,
-          vy: (Math.random() - 0.5) * 1.5,
-          size: Math.random() * 8 + 4,
-          color: colors[Math.floor(Math.random() * colors.length)],
-          opacity: Math.random() * 0.6 + 0.4,
-          shape: ['circle', 'square', 'triangle'][Math.floor(Math.random() * 3)] as 'circle' | 'square' | 'triangle',
-          rotation: Math.random() * Math.PI * 2,
-          rotationSpeed: (Math.random() - 0.5) * 0.05,
-        });
-      }
-    };
-
-    initParticles();
-
-    // Mouse move handler
-    const handleMouseMove = (e: MouseEvent) => {
-      const rect = canvas.getBoundingClientRect();
-      mouseRef.current = {
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top,
-      };
-    };
-
-    canvas.addEventListener('mousemove', handleMouseMove);
-
-    // Draw geometric shapes
-    const drawShape = (ctx: CanvasRenderingContext2D, particle: Particle) => {
-      ctx.save();
-      ctx.translate(particle.x, particle.y);
-      ctx.rotate(particle.rotation);
-      ctx.globalAlpha = particle.opacity;
-      ctx.fillStyle = particle.color;
-      ctx.strokeStyle = particle.color;
-      ctx.lineWidth = 2;
-
-      switch (particle.shape) {
-        case 'circle':
-          ctx.beginPath();
-          ctx.arc(0, 0, particle.size / 2, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.stroke();
-          break;
-        case 'square':
-          ctx.fillRect(-particle.size / 2, -particle.size / 2, particle.size, particle.size);
-          ctx.strokeRect(-particle.size / 2, -particle.size / 2, particle.size, particle.size);
-          break;
-        case 'triangle':
-          ctx.beginPath();
-          ctx.moveTo(0, -particle.size / 2);
-          ctx.lineTo(-particle.size / 2, particle.size / 2);
-          ctx.lineTo(particle.size / 2, particle.size / 2);
-          ctx.closePath();
-          ctx.fill();
-          ctx.stroke();
-          break;
-      }
-      ctx.restore();
-    };
-
-    // Draw connecting lines
-    const drawConnections = (ctx: CanvasRenderingContext2D) => {
-      const particles = particlesRef.current;
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-          const dx = particles[i].x - particles[j].x;
-          const dy = particles[i].y - particles[j].y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
-          
-          if (distance < 120) {
-            const opacity = (120 - distance) / 120 * 0.3;
-            ctx.save();
-            ctx.globalAlpha = opacity;
-            ctx.strokeStyle = particles[i].color;
-            ctx.lineWidth = 1;
-            ctx.beginPath();
-            ctx.moveTo(particles[i].x, particles[i].y);
-            ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.stroke();
-            ctx.restore();
+    const els = Array.from(document.querySelectorAll<HTMLElement>(".reveal"));
+    if (
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+      !("IntersectionObserver" in window)
+    ) {
+      els.forEach((el) => el.classList.add("is-visible"));
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            io.unobserve(entry.target);
           }
-        }
-      }
-    };
-
-    // Animation loop
-    const animate = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      particlesRef.current.forEach((particle) => {
-        // Mouse interaction
-        const dx = mouseRef.current.x - particle.x;
-        const dy = mouseRef.current.y - particle.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        const maxDistance = 100;
-
-        if (distance < maxDistance && distance > 0) {
-          const force = (maxDistance - distance) / maxDistance;
-          const angle = Math.atan2(dy, dx);
-          particle.vx -= Math.cos(angle) * force * 0.3;
-          particle.vy -= Math.sin(angle) * force * 0.3;
-        }
-
-        // Update position
-        particle.x += particle.vx;
-        particle.y += particle.vy;
-        particle.rotation += particle.rotationSpeed;
-
-        // Boundary collision with wrap-around
-        if (particle.x < 0) particle.x = canvas.width;
-        if (particle.x > canvas.width) particle.x = 0;
-        if (particle.y < 0) particle.y = canvas.height;
-        if (particle.y > canvas.height) particle.y = 0;
-
-        // Friction
-        particle.vx *= 0.99;
-        particle.vy *= 0.99;
-
-        // Draw particle
-        drawShape(ctx, particle);
-      });
-
-      // Draw connections
-      drawConnections(ctx);
-
-      requestAnimationFrame(animate);
-    };
-
-    animate();
-
-    return () => {
-      window.removeEventListener('resize', resizeCanvas);
-      canvas.removeEventListener('mousemove', handleMouseMove);
-    };
+        });
+      },
+      { threshold: 0.12, rootMargin: "0px 0px -8% 0px" }
+    );
+    els.forEach((el) => io.observe(el));
+    return () => io.disconnect();
   }, []);
+}
 
+/* ------------------------------------------------------------------ */
+/*  Section label — mono, lives in the margin                          */
+/* ------------------------------------------------------------------ */
+function SectionLabel({ index, title }: { index: string; title: string }) {
   return (
-    <canvas
-      ref={canvasRef}
-      className="absolute inset-0 w-full h-full pointer-events-auto"
-      style={{ zIndex: 1 }}
-    />
+    <div className="flex items-baseline gap-4 mb-10">
+      <span className="font-[family-name:var(--font-mono)] text-[var(--pen)] text-sm tracking-[0.2em]">
+        {index}
+      </span>
+      <h2 className="font-[family-name:var(--font-display)] text-3xl md:text-4xl font-semibold tracking-tight">
+        {title}
+      </h2>
+      <span className="flex-1 h-px bg-[var(--ink)] opacity-15 translate-y-[-2px]" />
+    </div>
   );
-};
+}
 
+const navItems = [
+  { id: "about", label: "About" },
+  { id: "education", label: "Education" },
+  { id: "skills", label: "Skills" },
+  { id: "experience", label: "Experience" },
+  { id: "contact", label: "Contact" },
+];
+
+const experience = [
+  {
+    role: "Backend Software Engineer Intern",
+    org: "Springer Capital",
+    place: "Remote",
+    dates: "Dec 2025 — Feb 2026",
+    notes: [
+      "Completed employer-led training in AI/ML, Azure, Django/DRF, PostgreSQL, and Python.",
+      "Proposed a RESTful ETL service in Flask with DLT checkpointing so HubSpot deal extractions restart after failures without losing data.",
+    ],
+  },
+  {
+    role: "AI Validation Expert",
+    org: "Snorkel AI",
+    place: "Remote",
+    dates: "Sep 2025 — Dec 2025",
+    notes: [
+      "Compared AI-generated code across Python, JavaScript, and TypeScript — grading logic, style, and explanations against user prompts to measure performance.",
+      "Improved Python repositories by re-prompting models for stronger submissions, mapping recurring failure patterns when models tried to shortcut accepted solutions.",
+    ],
+  },
+  {
+    role: "Software Engineer Intern (REU)",
+    org: "Limbitless Solutions @ UCF",
+    place: "Orlando, FL",
+    dates: "May 2025 — Jul 2025",
+    notes: [
+      "Helped build a prosthetic-training game in Unreal Engine and C++ for kids with limb differences.",
+      "Grounded in research on best practices, using electromyography (EMG) controls to reduce rates of prosthetic abandonment.",
+    ],
+  },
+  {
+    role: "Data Structures & Algorithms TA",
+    org: "Stony Brook University",
+    place: "Stony Brook, NY",
+    dates: "Jan 2024 — May 2026",
+    notes: [
+      "Guide students through data structures and algorithms each week, breaking down hard problems and showing how to approach them.",
+      "Wrote 100+ LeetCode-style practice problems and ran recitations for 60+ students on core CS concepts.",
+    ],
+  },
+  {
+    role: "Calculus IV Teaching Assistant",
+    org: "Stony Brook University",
+    place: "Stony Brook, NY",
+    dates: "Aug 2024 — Dec 2024",
+    notes: [
+      "Held weekly office hours helping students grasp systems of differential equations, conceptualizing problems and the patterns that emerge in applied differential equations.",
+    ],
+  },
+];
 
 export default function Home() {
-  const [activeCategory, setActiveCategory] = useState<keyof typeof skillsData>("programming");
-  const [formData, setFormData] = useState({
-    email: "",
-    message: ""
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
-  const [showCourses, setShowCourses] = useState(false);
-  const [activeCourseTab, setActiveCourseTab] = useState<'CS' | 'AMS'>('CS');
+  useReveal();
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const [activeCategory, setActiveCategory] =
+    useState<keyof typeof skillsData>("programming");
+  const [formData, setFormData] = useState({ email: "", message: "" });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">(
+    "idle"
+  );
+  const [showCourses, setShowCourses] = useState(false);
+  const [activeCourseTab, setActiveCourseTab] = useState<"CS" | "AMS">("CS");
+  const [activeSection, setActiveSection] = useState("about");
+
+  // Track which section is in view for the nav.
+  useEffect(() => {
+    const ids = navItems.map((n) => n.id);
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) setActiveSection(e.target.id);
+        });
+      },
+      { rootMargin: "-45% 0px -50% 0px" }
+    );
+    ids.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) io.observe(el);
+    });
+    return () => io.disconnect();
+  }, []);
+
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitStatus("idle");
-
     try {
-      // Create mailto link with form data
       const subject = encodeURIComponent("Portfolio Contact Form");
-      const body = encodeURIComponent(`Email: ${formData.email}\n\nMessage:\n${formData.message}`);
-      const mailtoLink = `mailto:toniliang10@gmail.com?subject=${subject}&body=${body}`;
-      
-      // Open email client
-      window.location.href = mailtoLink;
-      
+      const body = encodeURIComponent(
+        `Email: ${formData.email}\n\nMessage:\n${formData.message}`
+      );
+      window.location.href = `mailto:toniliang10@gmail.com?subject=${subject}&body=${body}`;
       setSubmitStatus("success");
       setFormData({ email: "", message: "" });
-    } catch (_err) {
+    } catch {
       setSubmitStatus("error");
     } finally {
       setIsSubmitting(false);
@@ -258,772 +169,584 @@ export default function Home() {
   };
 
   const renderSkillIcon = (name: string): React.ReactNode => {
-    // Prefer colored Devicon icons
     const deviconSlug: Record<string, string> = {
-      Python: 'python/python-original.svg',
-      JavaScript: 'javascript/javascript-original.svg',
-      TypeScript: 'typescript/typescript-original.svg',
-      Java: 'java/java-original.svg',
-      C: 'c/c-original.svg',
-      'C++': 'cplusplus/cplusplus-original.svg',
-      Rust: 'rust/rust-original.svg',
-      SQL: 'postgresql/postgresql-original.svg',
-      HTML: 'html5/html5-original.svg',
-      CSS: 'css3/css3-original.svg',
-      Haskell: 'haskell/haskell-original.svg',
-      'React.js': 'react/react-original.svg',
-      'Next.js': 'nextjs/nextjs-original.svg',
-      'Node.js': 'nodejs/nodejs-original.svg',
-      'Prisma ORM': 'prisma/prisma-original.svg',
-      'Express.js': 'express/express-original.svg',
-      'Tailwind CSS': 'tailwindcss/tailwindcss-original.svg',
-      Zod: '/local-zod',
-      MongoDB: 'mongodb/mongodb-original.svg',
-      PostgreSQL: 'postgresql/postgresql-original.svg',
-      AWS: 'amazonwebservices/amazonwebservices-original-wordmark.svg',
-      'Unreal Engine': 'unrealengine/unrealengine-original.svg',
-      GitHub: 'github/github-original.svg',
-      Cursor: '/local-cursor',
-      Vercel: 'vercel/vercel-original.svg',
-      Figma: 'figma/figma-original.svg',
-      Postman: 'postman/postman-original.svg',
-      Jest: 'jest/jest-plain.svg',
+      Python: "python/python-original.svg",
+      JavaScript: "javascript/javascript-original.svg",
+      TypeScript: "typescript/typescript-original.svg",
+      Java: "java/java-original.svg",
+      C: "c/c-original.svg",
+      "C++": "cplusplus/cplusplus-original.svg",
+      Rust: "rust/rust-original.svg",
+      SQL: "postgresql/postgresql-original.svg",
+      Ruby: "ruby/ruby-original.svg",
+      HTML: "html5/html5-original.svg",
+      CSS: "css3/css3-original.svg",
+      "React.js": "react/react-original.svg",
+      "Next.js": "nextjs/nextjs-original.svg",
+      "Node.js": "nodejs/nodejs-original.svg",
+      "Spring Boot": "spring/spring-original.svg",
+      Django: "django/django-plain.svg",
+      Flask: "flask/flask-original.svg",
+      Prisma: "prisma/prisma-original.svg",
+      "Express.js": "express/express-original.svg",
+      Angular: "angularjs/angularjs-original.svg",
+      "Tailwind CSS": "tailwindcss/tailwindcss-original.svg",
+      FastAPI: "fastapi/fastapi-original.svg",
+      Pandas: "pandas/pandas-original.svg",
+      NumPy: "numpy/numpy-original.svg",
+      PyTorch: "pytorch/pytorch-original.svg",
+      TensorFlow: "tensorflow/tensorflow-original.svg",
+      "scikit-learn": "scikitlearn/scikitlearn-original.svg",
+      SciPy: "scipy/scipy-original.svg",
+      Matplotlib: "matplotlib/matplotlib-original.svg",
+      MongoDB: "mongodb/mongodb-original.svg",
+      PostgreSQL: "postgresql/postgresql-original.svg",
+      AWS: "amazonwebservices/amazonwebservices-original-wordmark.svg",
+      Docker: "docker/docker-original.svg",
+      "Unreal Engine": "unrealengine/unrealengine-original.svg",
+      GitHub: "github/github-original.svg",
+      Cursor: "/local-cursor",
+      Postman: "postman/postman-original.svg",
+      Jest: "jest/jest-plain.svg",
     };
 
     const slug = deviconSlug[name];
+    if (slug === "/local-cursor") {
+      // eslint-disable-next-line @next/next/no-img-element
+      return <img src="/cursor.svg" alt="" className="w-5 h-5" aria-hidden />;
+    }
+    if (slug === "/local-zod") {
+      // eslint-disable-next-line @next/next/no-img-element
+      return <img src="/zod.svg" alt="" className="w-5 h-5" aria-hidden />;
+    }
     if (slug) {
-      if (slug === '/local-cursor') {
-        return (
-          <span className="inline-flex items-center justify-center w-7 h-7 rounded-md bg-white">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/cursor.svg" alt="Cursor logo" className="w-5 h-5" />
-          </span>
-        );
-      }
-      if (slug === '/local-zod') {
-        return (
-          <span className="inline-flex items-center justify-center w-7 h-7 rounded-md bg-white">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/zod.svg" alt="Zod logo" className="w-5 h-5" />
-          </span>
-        );
-      }
       return (
-        <span className="inline-flex items-center justify-center w-7 h-7 rounded-md bg-white">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={`https://cdn.jsdelivr.net/gh/devicons/devicon/icons/${slug}`}
-            alt={`${name} logo`}
-            className="w-5 h-5"
-          />
-        </span>
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={`https://cdn.jsdelivr.net/gh/devicons/devicon/icons/${slug}`}
+          alt=""
+          aria-hidden
+          className="w-5 h-5"
+        />
       );
     }
-
-    // Fallback: initials badge
     return (
-      <span className="inline-flex items-center justify-center w-7 h-7 rounded-md bg-gray-100 text-gray-700 text-sm">
+      <span className="font-[family-name:var(--font-mono)] text-xs text-[var(--ink-soft)]">
         {name.slice(0, 2).toUpperCase()}
       </span>
     );
   };
+
+  const categoryMeta: Record<keyof typeof skillsData, string> = {
+    programming: "Languages",
+    frameworks: "Frameworks & Libraries",
+    tools: "Tools & Platforms",
+  };
+
   return (
-    <div className="min-h-screen bg-white">
-      {/* Navigation Bar */}
-      <nav className="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-md shadow-sm z-50">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <ul className="flex justify-center space-x-8">
-            <li>
-              <a 
-                href="#about" 
-                className="text-gray-700 hover:text-purple-600 font-medium transition-colors hover:underline underline-offset-4 decoration-2 decoration-purple-600"
-              >
-                About
-              </a>
-            </li>
-            <li>
-              <a 
-                href="#education" 
-                className="text-gray-700 hover:text-purple-600 font-medium transition-colors hover:underline underline-offset-4 decoration-2 decoration-purple-600"
-              >
-                Education
-              </a>
-            </li>
-            <li>
-              <a 
-                href="#skills" 
-                className="text-gray-700 hover:text-purple-600 font-medium transition-colors hover:underline underline-offset-4 decoration-2 decoration-purple-600"
-              >
-                Skills
-              </a>
-            </li>
-            <li>
-              <a 
-                href="#experience" 
-                className="text-gray-700 hover:text-purple-600 font-medium transition-colors hover:underline underline-offset-4 decoration-2 decoration-purple-600"
-              >
-                Experience
-              </a>
-            </li>
-            <li>
-              <a 
-                href="#contact" 
-                className="text-gray-700 hover:text-purple-600 font-medium transition-colors hover:underline underline-offset-4 decoration-2 decoration-purple-600"
-              >
-                Contact
-              </a>
-            </li>
+    <div className="min-h-screen text-[var(--ink)]">
+      {/* ============================= NAV ============================= */}
+      <nav className="fixed top-0 inset-x-0 z-50 border-b border-[var(--ink)]/10 bg-[var(--paper)]/85 backdrop-blur-sm">
+        <div className="mx-auto max-w-5xl px-6 h-14 flex items-center justify-between">
+          <a
+            href="#about"
+            className="font-[family-name:var(--font-mono)] text-sm tracking-tight"
+          >
+            <span className="text-[var(--pen)]">T</span>L
+            <span className="text-[var(--ink-faint)]">/portfolio</span>
+          </a>
+          <ul className="hidden sm:flex items-center gap-6">
+            {navItems.map((item) => (
+              <li key={item.id}>
+                <a
+                  href={`#${item.id}`}
+                  className={`font-[family-name:var(--font-mono)] text-xs tracking-wide transition-colors ${
+                    activeSection === item.id
+                      ? "text-[var(--pen)]"
+                      : "text-[var(--ink-soft)] hover:text-[var(--ink)]"
+                  }`}
+                >
+                  {item.label}
+                </a>
+              </li>
+            ))}
           </ul>
         </div>
       </nav>
 
+      {/* Red margin rule (notebook paper) */}
+      <div
+        aria-hidden
+        className="pointer-events-none fixed top-0 bottom-0 left-6 md:left-[max(1.5rem,calc((100vw-64rem)/2))] w-px bg-[var(--pen)]/35 z-40"
+      />
 
-
-
-      {/* About Section */}
-      <section id="about" className="min-h-screen flex items-center pt-20 relative overflow-hidden bg-gradient-to-br from-gray-100 via-slate-200 to-gray-300">
-        <div className="max-w-7xl mx-auto px-6 py-16 w-full">
-          <div className="flex flex-col md:flex-row items-center gap-12 md:gap-16 mb-20 ml-40 mr-40 relative z-10">
-            {/* Left Container - Photo */}
-            <div className="flex-shrink-0 ">
-              <div className="relative w-64 h-64 md:w-80 md:h-80 rounded-full overflow-hidden shadow-2xl border-4 border-gray-100">
-                {/* <div className="w-full h-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
-                  <span className="text-white text-6xl font-bold">TL</span>
-                </div> */}
-                Replace the div above with your actual photo:
-                <Image 
-                  src="/portfolio-pfp.png" 
-                  alt="Toni Liang"
-                  fill
-                  className="object-cover"
-                  priority
-                />
-               
-              </div>
-            </div>
-
-            {/* Right Container - Text */}
-            <div className="flex-1 text-center md:text-left">
-              <p className="text-xl text-gray-600 mb-2">Hi, my name is</p>
-              <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
-                Toni Liang
-              </h1>
-              <p className="text-xl md:text-2xl text-gray-700 leading-relaxed mb-8">
-                I am a Senior at Stony Brook University with a passion for building with care and purpose.
+      <main className="mx-auto max-w-5xl px-6">
+        {/* ============================ ABOUT ============================ */}
+        <section
+          id="about"
+          className="min-h-screen flex items-center pt-24 pb-16"
+        >
+          <div className="grid md:grid-cols-[1.4fr_1fr] gap-12 md:gap-16 items-center w-full">
+            {/* Text */}
+            <div>
+              <p className="rise rise-1 font-[family-name:var(--font-mono)] text-sm text-[var(--ink-soft)] tracking-wide mb-5">
+                {/* honest coordinates: where this person sits */}
+                Hi, my name is
               </p>
-              <a 
-                href="#education"
-                className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl group"
-              >
-                <span>Learn More About Me</span>
-                <svg className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                </svg>
-              </a>
-            </div>
-          </div>
-          
-          {/* Geometric Animation Container */}
-          <div className="absolute bottom-0 left-0 right-0 h-80 pointer-events-auto">
-            <GeometricAnimation />
-          </div>
-        </div>
-      </section>
 
+              <h1 className="font-[family-name:var(--font-display)] font-bold leading-[0.92] tracking-tight text-[clamp(3rem,9vw,6.2rem)]">
+                <span className="rise rise-1 block">Toni</span>
+                <span className="rise rise-2 block">Liang</span>
+              </h1>
 
+              <p className="rise rise-3 mt-7 text-lg md:text-xl leading-relaxed text-[var(--ink-soft)] max-w-xl">
+                Stony Brook graduate, soon starting an M.S. in Computer Science
+                at Georgia Tech, working at the intersection of{" "}
+                <span className="text-[var(--ink)] font-medium whitespace-nowrap">
+                  Computer Science
+                </span>{" "}
+                <span className="text-[var(--ink)] font-medium whitespace-nowrap">
+                  ∩ Applied Mathematics
+                </span>
+                . I build with care and purpose — and spend a lot of time
+                teaching others to do the same.
+              </p>
 
-
-      {/* Education Section */}
-      <section id="education" className="py-20 bg-gray-50">
-        <div className="max-w-5xl mx-auto px-6 w-full">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Education
-            </h2>
-            <div className="w-20 h-1 bg-gradient-to-r from-purple-500 to-pink-500 mx-auto"></div>
-          </div>
-          
-          <div className="max-w-3xl mx-auto">
-            <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-              <div className="flex flex-col md:flex-row">
-                {/* Left Panel - University Logo */}
-                <div className="md:w-1/3 bg-gradient-to-br flex items-center justify-center">
-                  <div className="text-center">
-                    {/* Stony Brook University logo */}
-                     <div className="w-48 h-48 md:w-56 md:h-56 rounded-full flex items-center justify-center mb-3 mx-auto shadow-lg p-6">
-                       <Image src="/sbu-logo.png" alt="SBU Logo" width={280} height={280} className="object-contain" />
-                     </div>
-                  </div>
-                </div>
-                
-                {/* Right Panel - Education Information */}
-                <div className="md:w-2/3 p-6 md:p-8">
-                  <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-3">
-                    Stony Brook University
-                  </h3>
-                  
-                  <div className="space-y-2 mb-4">
-                    <p className="text-base text-gray-700">
-                      <span className="font-semibold">B.S, Computer Science</span>
-                    </p>
-                    <p className="text-base text-gray-700">
-                      Double major in Applied Mathematics
-                    </p>
-                    <p className="text-base text-gray-700">
-                      Expected BS Graduation: <span className="font-semibold">May 2026</span>
-                    </p>
-                  </div>
-                  
-                  <div className="border-t pt-3 mb-4">
-                    <p className="text-base text-gray-700 mb-1">
-                      <span className="font-semibold">GPA:</span> 3.65/4.0
-                    </p>
-                    <p className="text-base text-gray-700">
-                      <span className="font-semibold">Dean&apos;s list all Semesters</span>
-                    </p>
-                  </div>
-                  
-                  <button
-                    onClick={() => setShowCourses(prev => !prev)}
-                    className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-2 px-5 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg text-sm"
+              <div className="rise rise-4 mt-9 flex flex-wrap items-center gap-4">
+                <a
+                  href="#education"
+                  className="group inline-flex items-center gap-2 bg-[var(--ink)] text-[var(--paper)] px-6 py-3 text-sm font-medium tracking-wide hover:bg-[var(--pen)] transition-colors"
+                >
+                  View the work
+                  <span className="transition-transform group-hover:translate-y-0.5">
+                    ↓
+                  </span>
+                </a>
+                <span className="relative inline-block">
+                  <a
+                    href="https://docs.google.com/document/d/1GC-fDsrP04xF3k2AfkhoGCNi7lA_be8rU3WhK-X9JoA/edit?tab=t.0"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="font-[family-name:var(--font-mono)] text-sm text-[var(--ink-soft)] hover:text-[var(--ink)] px-1"
                   >
-                    {showCourses ? 'Hide Coursework' : 'Relevant Coursework'}
-                  </button>
+                    Résumé ↗
+                  </a>
+                  {/* the one pen annotation — circling the résumé */}
+                  <svg
+                    className="absolute -inset-x-3 -inset-y-2 w-[calc(100%+1.5rem)] h-[calc(100%+1rem)] overflow-visible pointer-events-none"
+                    viewBox="0 0 160 56"
+                    preserveAspectRatio="none"
+                    aria-hidden
+                  >
+                    <path
+                      className="pen-stroke"
+                      style={{ ["--len" as string]: 420 }}
+                      strokeWidth={2.4}
+                      d="M22 30 C 6 18, 30 6, 80 6 C 142 6, 156 20, 152 32 C 148 46, 110 52, 60 52 C 16 52, 6 42, 22 26 C 26 22, 32 20, 40 19"
+                    />
+                  </svg>
+                </span>
+              </div>
+            </div>
+
+            {/* Photo plate — Fig. 1 */}
+            <div className="rise rise-3 justify-self-center md:justify-self-end">
+              <figure className="relative">
+                <div className="relative w-64 md:w-80 aspect-[1637/1712] border border-[var(--ink)] bg-[var(--paper-edge)] overflow-hidden">
+                  <Image
+                    src="/portfolio-pfp.png"
+                    alt="Toni Liang"
+                    fill
+                    className="object-contain"
+                    priority
+                  />
                 </div>
+                <figcaption className="mt-3 font-[family-name:var(--font-mono)] text-xs text-[var(--ink-soft)] flex justify-between">
+                  <span>Fig. 1</span>
+                  <span>New York, NY</span>
+                </figcaption>
+              </figure>
+            </div>
+          </div>
+        </section>
+
+        {/* ========================== EDUCATION ========================== */}
+        <section id="education" className="py-24 reveal">
+          <SectionLabel index="01 / EDU" title="Education" />
+
+          <div className="space-y-5">
+          {/* Georgia Tech — incoming master's */}
+          <div className="border border-[var(--ink)]/15 bg-[var(--paper-edge)]/60">
+            <div className="grid md:grid-cols-[auto_1fr]">
+              {/* Crest */}
+              <div className="flex items-center justify-center p-8 border-b md:border-b-0 md:border-r border-[var(--ink)]/15">
+                <Image
+                  src="/georgia-tech-logo.svg"
+                  alt="Georgia Institute of Technology"
+                  width={140}
+                  height={140}
+                  unoptimized
+                  className="object-contain w-28 h-28 md:w-36 md:h-36"
+                />
+              </div>
+
+              {/* Record */}
+              <div className="p-8">
+                <div className="flex flex-wrap items-baseline gap-x-3">
+                  <h3 className="font-[family-name:var(--font-display)] text-2xl font-semibold tracking-tight">
+                    Georgia Institute of Technology
+                  </h3>
+                  <span className="font-[family-name:var(--font-mono)] text-xs text-[var(--pen)] tracking-wide">
+                    incoming
+                  </span>
+                </div>
+                <p className="mt-1 text-[var(--ink-soft)]">
+                  M.S. Computer Science · Specialization: AI &amp; Machine
+                  Learning
+                </p>
+
+                <dl className="mt-6 grid grid-cols-2 sm:grid-cols-3 gap-y-5 gap-x-6 font-[family-name:var(--font-mono)] text-sm">
+                  <div>
+                    <dt className="text-[var(--ink-faint)] text-xs tracking-wide">
+                      Term
+                    </dt>
+                    <dd className="mt-1 text-base">Aug 2026 — May 2028</dd>
+                  </div>
+                  <div>
+                    <dt className="text-[var(--ink-faint)] text-xs tracking-wide">
+                      Location
+                    </dt>
+                    <dd className="mt-1 text-base">Atlanta, GA</dd>
+                  </div>
+                </dl>
               </div>
             </div>
           </div>
 
-          {/* Coursework Drawer */}
-          {showCourses && (
-            <div className="mt-6 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
-              {/* Tabs */}
-              <div className="flex">
-                <button
-                  onClick={() => setActiveCourseTab('CS')}
-                  className={`flex-1 px-4 py-3 text-sm font-semibold transition-colors ${
-                    activeCourseTab === 'CS'
-                      ? 'text-white bg-gradient-to-r from-indigo-500 to-purple-500'
-                      : 'text-gray-700 hover:bg-gray-50'
-                  }`}
-                >
-                  CS
-                </button>
-                <button
-                  onClick={() => setActiveCourseTab('AMS')}
-                  className={`flex-1 px-4 py-3 text-sm font-semibold transition-colors ${
-                    activeCourseTab === 'AMS'
-                      ? 'text-white bg-gradient-to-r from-indigo-500 to-purple-500'
-                      : 'text-gray-700 hover:bg-gray-50'
-                  }`}
-                >
-                  Applied Math
-                </button>
+          {/* Stony Brook — B.S., completed */}
+          <div className="border border-[var(--ink)]/15 bg-[var(--paper-edge)]/60">
+            <div className="grid md:grid-cols-[auto_1fr]">
+              {/* Crest */}
+              <div className="flex items-center justify-center p-8 border-b md:border-b-0 md:border-r border-[var(--ink)]/15">
+                <Image
+                  src="/sbu-logo.png"
+                  alt="Stony Brook University"
+                  width={140}
+                  height={140}
+                  className="object-contain w-28 h-28 md:w-36 md:h-36"
+                />
               </div>
 
-              {/* List */}
-              <div className="p-4">
-                  <ul className="divide-y divide-gray-200">
-                  {(activeCourseTab === 'CS' ? coursesData.cs : coursesData.ams).map((course: { code: string; title: string }) => (
-                    <li key={course.code} className="py-2 flex items-center justify-between">
-                      <span className="font-semibold text-gray-900">{course.code}</span>
-                      <span className="text-gray-700">{course.title}</span>
+              {/* Record */}
+              <div className="p-8">
+                <h3 className="font-[family-name:var(--font-display)] text-2xl font-semibold tracking-tight">
+                  Stony Brook University
+                </h3>
+                <p className="mt-1 text-[var(--ink-soft)]">
+                  B.S. Computer Science · Applied Mathematics &amp; Statistics
+                </p>
+
+                {/* Transcript-style data row */}
+                <dl className="mt-6 grid grid-cols-2 sm:grid-cols-3 gap-y-5 gap-x-6 font-[family-name:var(--font-mono)] text-sm">
+                  <div>
+                    <dt className="text-[var(--ink-faint)] text-xs tracking-wide">
+                      GPA
+                    </dt>
+                    <dd className="mt-1 text-base">3.66 / 4.00</dd>
+                  </div>
+                  <div>
+                    <dt className="text-[var(--ink-faint)] text-xs tracking-wide">
+                      Graduated
+                    </dt>
+                    <dd className="mt-1 text-base">May 2026</dd>
+                  </div>
+                  <div className="relative">
+                    <dt className="text-[var(--ink-faint)] text-xs tracking-wide">
+                      Honors
+                    </dt>
+                    <dd className="mt-1 text-base inline-flex items-center gap-2">
+                      Dean&apos;s List
+                      {/* margin checkmark — the TA's tick */}
+                      <span
+                        aria-hidden
+                        className="text-[var(--pen)] text-lg leading-none"
+                      >
+                        ✓
+                      </span>
+                    </dd>
+                  </div>
+                </dl>
+
+                <button
+                  onClick={() => setShowCourses((p) => !p)}
+                  className="mt-7 font-[family-name:var(--font-mono)] text-sm border border-[var(--ink)] px-4 py-2 hover:bg-[var(--ink)] hover:text-[var(--paper)] transition-colors"
+                  aria-expanded={showCourses}
+                >
+                  {showCourses ? "− Hide coursework" : "+ Relevant coursework"}
+                </button>
+              </div>
+            </div>
+
+            {/* Coursework drawer */}
+            {showCourses && (
+              <div className="border-t border-[var(--ink)]/15">
+                <div className="flex font-[family-name:var(--font-mono)] text-sm border-b border-[var(--ink)]/15">
+                  {(["CS", "AMS"] as const).map((tab) => (
+                    <button
+                      key={tab}
+                      onClick={() => setActiveCourseTab(tab)}
+                      className={`px-5 py-3 transition-colors ${
+                        activeCourseTab === tab
+                          ? "text-[var(--pen)] border-b-2 border-[var(--pen)] -mb-px"
+                          : "text-[var(--ink-soft)] hover:text-[var(--ink)]"
+                      }`}
+                    >
+                      {tab === "CS" ? "Computer Science" : "Applied Math"}
+                    </button>
+                  ))}
+                </div>
+                <ul className="grid sm:grid-cols-2 gap-x-10 px-8 py-6 font-[family-name:var(--font-mono)] text-sm">
+                  {(activeCourseTab === "CS"
+                    ? coursesData.cs
+                    : coursesData.ams
+                  ).map((course: { code: string; title: string }) => (
+                    <li
+                      key={course.code}
+                      className="flex items-baseline gap-3 py-1.5 border-b border-dashed border-[var(--ink)]/10"
+                    >
+                      <span className="text-[var(--pen)] shrink-0 w-20">
+                        {course.code}
+                      </span>
+                      <span className="text-[var(--ink-soft)]">
+                        {course.title}
+                      </span>
                     </li>
                   ))}
                 </ul>
               </div>
-            </div>
-          )}
-
-        </div>
-      </section>
-
-
-
-
-      {/* Skills Section */}
-      <section id="skills" className="py-20 bg-gradient-to-br from-gray-50 to-gray-100">
-        <div className="max-w-7xl mx-auto px-6 w-full mt-20 mb-20">
-          {/* Section Header */}
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              Skills & Expertise
-            </h2>
-            <div className="w-24 h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 mx-auto mb-6"></div>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Explore my technical skills across different categories proficiency levels
-            </p>
+            )}
           </div>
-
-          {/* Category Buttons */}
-          <div className="flex flex-wrap justify-center gap-4 mb-12">
-            <button
-              onClick={() => setActiveCategory("programming")}
-              className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 ${
-                activeCategory === "programming"
-                  ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/25"
-                  : "bg-white text-gray-700 hover:bg-gray-100 shadow-md hover:shadow-lg"
-              }`}
-            >
-              Programming Languages
-            </button>
-            <button
-              onClick={() => setActiveCategory("frameworks")}
-              className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 ${
-                activeCategory === "frameworks"
-                  ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/25"
-                  : "bg-white text-gray-700 hover:bg-gray-100 shadow-md hover:shadow-lg"
-              }`}
-            >
-              Frameworks & Libraries
-            </button>
-            <button
-              onClick={() => setActiveCategory("tools")}
-              className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 ${
-                activeCategory === "tools"
-                  ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/25"
-                  : "bg-white text-gray-700 hover:bg-gray-100 shadow-md hover:shadow-lg"
-              }`}
-            >
-              Tools & Platforms
-            </button>
           </div>
+        </section>
 
-          {/* Skills Grid */}
-          <div className="max-w-6xl mx-auto">
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-              {skillsData[activeCategory].map((skill, index) => (
-                <div
-                  key={skill.name}
-                  className="bg-white rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 group"
-                  style={{
-                    animationDelay: `${index * 100}ms`,
-                    animation: "fadeInUp 0.6s ease-out forwards"
-                  }}
-                >
-                  <div className="flex items-center gap-2">
-                    {renderSkillIcon(skill.name)}
-                    <h3 className="text-sm font-semibold text-gray-900 group-hover:text-purple-600 transition-colors">
-                      {skill.name}
-                    </h3>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+        {/* ============================ SKILLS ============================ */}
+        <section id="skills" className="py-24 reveal">
+          <SectionLabel index="02 / SKL" title="Skills" />
 
-        </div>
-      </section>
-
-
-
-
-      {/* Experience Section */}
-      <section id="experience" className="py-20 bg-gradient-to-br from-slate-50 via-indigo-50 to-purple-50">
-        <div className="max-w-6xl mx-auto px-6 w-full">
-          {/* Section Header */}
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              Experience
-            </h2>
-            <div className="w-24 h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 mx-auto mb-6"></div>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              My journey of growth, learning, and making a difference
-            </p>
-          </div>
-
-          {/* Timeline */}
-          <div className="relative">
-            {/* Timeline Line */}
-            <div className="absolute left-1/2 transform -translate-x-1/2 w-1 h-full bg-gradient-to-b from-indigo-400 via-purple-400 to-pink-400 rounded-full animate-timeline-flow"></div>
-
-            {/* Timeline Items */}
-            <div className="space-y-20">
-
-              {/* Experience 1 */}
-              <div className="relative flex items-center animate-timeline-slide-right" style={{animationDelay: '0.2s'}}>
-                {/* Timeline Dot */}
-                <div className="absolute left-1/2 transform -translate-x-1/2 w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full border-4 border-white shadow-xl z-10 animate-timeline-dot ml-4"></div>
-                
-                {/* Content */}
-                <div className="w-5/12 ml-auto pr-8">
-                  <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 hover:scale-105 border border-indigo-100">
-                    <div className="flex items-center mb-6">
-                      <div className="w-16 h-16 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg animate-icon-float">
-                        💼
-                      </div>
-                      <div className="ml-6">
-                        <h3 className="text-2xl font-bold text-gray-900 mb-1">Backend Software Engineering Intern</h3>
-                        <p className="text-indigo-600 font-semibold text-lg">Springer Capital</p>
-                        <p className="text-gray-500">Remote • December 2025 - Present</p>
-                      </div>
-                    </div>
-                    <div className="space-y-4">
-                      <p className="text-gray-700 leading-relaxed text-lg">
-                        At Springer Capital I finished employer-led training in AI/ML, Azure, Django/DRF, PostgreSQL, and Python. 
-                      </p>
-                      <p className="text-gray-700 leading-relaxed text-lg">
-                        Then, I proposed a RESTful ETL service in Flask with DLT checkpointing so HubSpot deal extractions could restart after failures without losing data.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Experience 2 */}
-              <div className="relative flex items-center animate-timeline-slide-left" style={{animationDelay: '0.4s'}}>
-                {/* Timeline Dot */}
-                <div className="absolute left-1/2 transform -translate-x-1/2 w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full border-4 border-white shadow-xl z-10 animate-timeline-dot ml-4"></div>
-                
-                {/* Content */}
-                <div className="w-5/12 mr-auto pl-8">
-                  <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 hover:scale-105 border border-purple-100">
-                    <div className="flex items-center mb-6">
-                      <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg animate-icon-float">
-                        🤖
-                      </div>
-                      <div className="ml-6">
-                        <h3 className="text-2xl font-bold text-gray-900 mb-1">AI Contributor</h3>
-                        <p className="text-purple-600 font-semibold text-lg">SnorkelAI</p>
-                        <p className="text-gray-500">Remote • September 2025 - Present</p>
-                      </div>
-                    </div>
-                    <div className="space-y-4">
-                      <p className="text-gray-700 leading-relaxed text-lg">
-                        At SnorkelAI I compared AI-generated code across Python, JavaScript, and TypeScript, grading logic, style, and explanations against user prompts to measure performance.
-                      </p>
-                      <p className="text-gray-700 leading-relaxed text-lg">
-                      I contributed to improving Python repositories by re-prompting models for stronger submissions to large LLM customers, mapping recurring failure patterns when models tried to shortcut accepted solutions.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Experience 3 */}
-              <div className="relative flex items-center animate-timeline-slide-right" style={{animationDelay: '0.2s'}}>
-                {/* Timeline Dot */}
-                <div className="absolute left-1/2 transform -translate-x-1/2 w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full border-4 border-white shadow-xl z-10 animate-timeline-dot ml-4"></div>
-                
-                {/* Content */}
-                <div className="w-5/12 ml-auto pr-8">
-                  <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 hover:scale-105 border border-indigo-100">
-                    <div className="flex items-center mb-6">
-                      <div className="w-16 h-16 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg animate-icon-float">
-                        🎮
-                      </div>
-                      <div className="ml-6">
-                        <h3 className="text-2xl font-bold text-gray-900 mb-1">Game Developer Intern & Researcher</h3>
-                        <p className="text-indigo-600 font-semibold text-lg">Limbitless Solutions @ UCF</p>
-                        <p className="text-gray-500">Orlando, FL • May 2025 - July 2025</p>
-                      </div>
-                    </div>
-                    <div className="space-y-4">
-                      <p className="text-gray-700 leading-relaxed text-lg">
-                        At Limbitless Solutions I helped build a prosthetic training game in Unreal Engine and C++ for kids with limb differences, making prosthetic training more fun.
-                      </p>
-                      <p className="text-gray-700 leading-relaxed text-lg">
-                        The game was built on top of numerous research data of best practices, using electromyography (EMG) controls to help decrease the rates of prosthetic abandonment.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Experience 4 */}
-              <div className="relative flex items-center animate-timeline-slide-left" style={{animationDelay: '0.4s'}}>
-                {/* Timeline Dot */}
-                <div className="absolute left-1/2 transform -translate-x-1/2 w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full border-4 border-white shadow-xl z-10 animate-timeline-dot ml-4"></div>
-                
-                {/* Content */}
-                <div className="w-5/12 mr-auto pl-8">
-                  <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 hover:scale-105 border border-purple-100">
-                    <div className="flex items-center mb-6">
-                      <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg animate-icon-float">
-                        📚
-                      </div>
-                      <div className="ml-6">
-                        <h3 className="text-2xl font-bold text-gray-900 mb-1">Data Structures & Algorithms TA</h3>
-                        <p className="text-purple-600 font-semibold text-lg">Stony Brook University</p>
-                        <p className="text-gray-500">Stony Brook, NY • Jan 2024 - Present</p>
-                      </div>
-                    </div>
-                    <div className="space-y-4">
-                      <p className="text-gray-700 leading-relaxed text-lg">
-                        Every week I guide students through data structures and algorithms, breaking down tough problems and showing best practices of how to solve them.
-                      </p>
-                      <p className="text-gray-700 leading-relaxed text-lg">
-                        I have written over 100 practice problems (LeetCode style), and ran recitations for over 60 students to support them on these fundamental concepts of CS.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Experience 5 */}
-              <div className="relative flex items-center animate-timeline-slide-right" style={{animationDelay: '0.6s'}}>
-                {/* Timeline Dot */}
-                <div className="absolute left-1/2 transform -translate-x-1/2 w-8 h-8 bg-gradient-to-r from-pink-500 to-rose-500 rounded-full border-4 border-white shadow-xl z-10 animate-timeline-dot  ml-4"></div>
-                
-                {/* Content */}
-                <div className="w-5/12 ml-auto pr-8">
-                  <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 hover:scale-105 border border-pink-100">
-                    <div className="flex items-center mb-6">
-                      <div className="w-16 h-16 bg-gradient-to-r from-pink-500 to-rose-500 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg animate-icon-float">
-                        ∫
-                      </div>
-                      <div className="ml-6">
-                        <h3 className="text-2xl font-bold text-gray-900 mb-1">Calculus IV Teaching Assistant</h3>
-                        <p className="text-pink-600 font-semibold text-lg">Stony Brook University</p>
-                        <p className="text-gray-500">Stony Brook, NY • August 2024 - Dec 2024</p>
-                      </div>
-                    </div>
-                    <div className="space-y-4">
-                      <p className="text-gray-700 leading-relaxed text-lg">
-                        Every week, I held office hours to to help students grasp systems of differential equations.
-                        Analyzing and understanding applied differential equations can feel intimidating, so I helped
-                        conceptualize problems and analyze patterns that emerge in these problems.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-
-            </div>
-          </div>
-        </div>
-      </section>
-
-
-
-
-      {/* Contact Section */}
-      <section id="contact" className="py-20 bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50">
-        <div className="max-w-6xl mx-auto px-6 w-full">
-          {/* Section Header */}
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              Get In Touch
-            </h2>
-            <div className="w-24 h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 mx-auto mb-6"></div>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Have a project in mind or want to collaborate? I&apos;d love to hear from you!
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-            {/* Contact Info */}
-            <div className="space-y-8">
-              <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-blue-100">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">Let&apos;s Connect</h3>
-                <div className="space-y-6">
-                  <div className="flex items-center space-x-4">
-                    <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
-                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                      </svg>
-                    </div>
-                    <div>
-                      <p className="text-gray-600 text-sm">Email</p>
-                      <p className="text-gray-900 font-semibold">toniliang10@gmail.com</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-4">
-                    <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
-                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
-                    </div>
-                    <div>
-                      <p className="text-gray-600 text-sm">Location</p>
-                      <p className="text-gray-900 font-semibold">New York, NY</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-4">
-                    <div className="w-12 h-12 bg-gradient-to-r from-pink-500 to-rose-500 rounded-full flex items-center justify-center">
-                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                    </div>
-                    <div>
-                      <p className="text-gray-600 text-sm">Response Time</p>
-                      <p className="text-gray-900 font-semibold">Within 24 hours</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Contact Form */}
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-purple-100">
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div>
-                  <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
-                    Email Address
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 bg-white/50 backdrop-blur-sm placeholder-gray-600 text-black"
-                    placeholder="Email"
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="message" className="block text-sm font-semibold text-gray-700 mb-2">
-                    Message
-                  </label>
-                  <textarea
-                    id="message"
-                    name="message"
-                    value={formData.message}
-                    onChange={handleInputChange}
-                    required
-                    rows={6}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 bg-white/50 backdrop-blur-sm resize-none placeholder-gray-600 text-black"
-                    placeholder="Tell me about your project or just say hello!"
-                  />
-                </div>
-
+          {/* Category switch — tab row, not pills */}
+          <div className="flex flex-wrap gap-x-8 gap-y-2 border-b border-[var(--ink)]/15 pb-3 mb-8 font-[family-name:var(--font-mono)] text-sm">
+            {(Object.keys(skillsData) as Array<keyof typeof skillsData>).map(
+              (cat) => (
                 <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1 disabled:transform-none disabled:cursor-not-allowed"
+                  key={cat}
+                  onClick={() => setActiveCategory(cat)}
+                  className={`transition-colors ${
+                    activeCategory === cat
+                      ? "text-[var(--pen)]"
+                      : "text-[var(--ink-soft)] hover:text-[var(--ink)]"
+                  }`}
                 >
-                  {isSubmitting ? (
-                    <div className="flex items-center justify-center space-x-2">
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      <span>Sending...</span>
-                    </div>
-                  ) : (
-                    "Send Message"
-                  )}
+                  {categoryMeta[cat]}
+                  <span className="ml-2 text-[var(--ink-faint)]">
+                    {String(skillsData[cat].length).padStart(2, "0")}
+                  </span>
                 </button>
-
-                {submitStatus === "success" && (
-                  <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-                    <p className="text-green-700 text-sm font-medium">
-                      ✅ Message sent successfully! I&apos;ll get back to you soon.
-                    </p>
-                  </div>
-                )}
-
-                {submitStatus === "error" && (
-                  <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-                    <p className="text-red-700 text-sm font-medium">
-                      ❌ Something went wrong. Please try again or email me directly.
-                    </p>
-                  </div>
-                )}
-              </form>
-            </div>
+              )
+            )}
           </div>
-        </div>
-      </section>
 
-      {/* Footer */}
-      <footer className="bg-gradient-to-br from-slate-900 via-purple-900 to-indigo-900 text-white py-12">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-            {/* About */}
+          <ul className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+            {skillsData[activeCategory].map((skill, i) => (
+              <li
+                key={skill.name}
+                className="group flex items-center gap-3 border border-[var(--ink)]/15 bg-[var(--paper)] px-4 py-3 hover:border-[var(--pen)] transition-colors"
+                style={{ animation: "rise-in 0.5s ease-out backwards", animationDelay: `${i * 35}ms` }}
+              >
+                <span className="flex items-center justify-center w-6 h-6 shrink-0">
+                  {renderSkillIcon(skill.name)}
+                </span>
+                <span className="text-sm font-medium truncate">
+                  {skill.name}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        {/* ========================== EXPERIENCE ========================== */}
+        <section id="experience" className="py-24 reveal">
+          <SectionLabel index="03 / EXP" title="Experience" />
+
+          <ol className="space-y-5">
+            {experience.map((job, i) => (
+              <li
+                key={i}
+                className="border border-[var(--ink)]/15 border-l-2 border-l-[var(--pen)] bg-[var(--paper-edge)]/60 p-6 md:p-8 transition-colors hover:border-[var(--ink)]/30"
+              >
+                <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                  <h3 className="font-[family-name:var(--font-display)] text-xl md:text-2xl font-semibold tracking-tight">
+                    {job.role}
+                  </h3>
+                  <p className="font-[family-name:var(--font-mono)] text-xs text-[var(--ink-faint)] tracking-wide">
+                    {job.dates} · {job.place}
+                  </p>
+                </div>
+                <p className="text-[var(--pen)] font-[family-name:var(--font-mono)] text-sm mt-1">
+                  {job.org}
+                </p>
+                <div className="mt-4 space-y-3 max-w-2xl">
+                  {job.notes.map((note, j) => (
+                    <p
+                      key={j}
+                      className="text-[var(--ink-soft)] leading-relaxed"
+                    >
+                      {note}
+                    </p>
+                  ))}
+                </div>
+              </li>
+            ))}
+          </ol>
+        </section>
+
+        {/* ============================ CONTACT ============================ */}
+        <section id="contact" className="py-24 reveal">
+          <SectionLabel index="04 / MSG" title="Get in touch" />
+
+          <div className="grid md:grid-cols-2 gap-12 md:gap-16">
+            {/* Details — definition list */}
             <div>
-              <h3 className="text-xl font-bold mb-4">Toni Liang</h3>
-              <p className="text-gray-400 leading-relaxed">
-                Senior Computer Science student at Stony Brook University with a passion for creating software tools with purpose.
+              <p className="text-lg text-[var(--ink-soft)] leading-relaxed max-w-md">
+                Open to new-grad and internship roles in backend, ML, and
+                anywhere math meets software. The fastest way to reach me is the
+                form — or directly below.
               </p>
+
+              <dl className="mt-10 font-[family-name:var(--font-mono)] text-sm space-y-5">
+                {[
+                  { k: "Email", v: "toniliang10@gmail.com" },
+                  { k: "Location", v: "New York, NY" },
+                  { k: "Reply", v: "Within 24 hours" },
+                ].map((row) => (
+                  <div
+                    key={row.k}
+                    className="flex items-baseline gap-4 border-b border-dashed border-[var(--ink)]/15 pb-3"
+                  >
+                    <dt className="text-[var(--ink-faint)] w-20 shrink-0">
+                      {row.k}
+                    </dt>
+                    <dd>{row.v}</dd>
+                  </div>
+                ))}
+              </dl>
             </div>
 
-            {/* Quick Links */}
-            <div>
-              <h3 className="text-xl font-bold mb-4">Quick Links</h3>
-              <ul className="space-y-2">
-                <li>
-                  <a href="#about" className="text-gray-400 hover:text-white transition-colors">
-                    About
-                  </a>
-                </li>
-                <li>
-                  <a href="#education" className="text-gray-400 hover:text-white transition-colors">
-                    Education
-                  </a>
-                </li>
-                <li>
-                  <a href="#skills" className="text-gray-400 hover:text-white transition-colors">
-                    Skills
-                  </a>
-                </li>
-                <li>
-                  <a href="#experience" className="text-gray-400 hover:text-white transition-colors">
-                    Experience
-                  </a>
-                </li>
-                <li>
-                  <a href="#contact" className="text-gray-400 hover:text-white transition-colors">
-                    Contact
-                  </a>
-                </li>
-              </ul>
-            </div>
-
-            {/* Social Links */}
-            <div>
-              <h3 className="text-xl font-bold mb-4">Connect With Me</h3>
-              <div className="flex space-x-4">
-                <a
-                  href="https://www.linkedin.com/in/toniliang10/"
-                  className="w-12 h-12 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 rounded-full flex items-center justify-center transition-all duration-200 transform hover:scale-110 shadow-lg hover:shadow-xl"
-                  aria-label="LinkedIn"
-                  target="_blank"
+            {/* Form — carded */}
+            <form
+              onSubmit={handleSubmit}
+              className="space-y-7 border border-[var(--ink)]/15 bg-[var(--paper-edge)]/60 p-6 md:p-8"
+            >
+              <div>
+                <label
+                  htmlFor="email"
+                  className="block font-[family-name:var(--font-mono)] text-xs text-[var(--ink-soft)] tracking-wide mb-2"
                 >
-                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                  </svg>
-                </a>
-                <a
-                  href="https://github.com/toniliang-10"
-                  className="w-12 h-12 bg-gradient-to-r from-gray-800 to-gray-900 hover:from-gray-900 hover:to-black rounded-full flex items-center justify-center transition-all duration-200 transform hover:scale-110 shadow-lg hover:shadow-xl"
-                  aria-label="GitHub"
-                  target="_blank"
-                >
-                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                  </svg>
-                </a>
-                <a
-                  href="https://docs.google.com/document/d/1GC-fDsrP04xF3k2AfkhoGCNi7lA_be8rU3WhK-X9JoA/edit?tab=t.0"
-                  className="w-12 h-12 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 rounded-full flex items-center justify-center transition-all duration-200 transform hover:scale-110 shadow-lg hover:shadow-xl"
-                  aria-label="Resume"
-                  target="_blank"
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                </a>
-                <a
-                  href="https://www.instagram.com/toni.liang_/"
-                  className="w-12 h-12 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 rounded-full flex items-center justify-center transition-all duration-200 transform hover:scale-110 shadow-lg hover:shadow-xl"
-                  aria-label="Instagram"
-                  target="_blank"
-                >
-                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                  </svg>
-                </a>
+                  Your email
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  required
+                  placeholder="you@example.com"
+                  className="w-full bg-[var(--paper)] border border-[var(--ink)]/30 px-3 py-2 text-[var(--ink)] placeholder-[var(--ink-faint)] focus:outline-none focus:border-[var(--pen)] transition-colors"
+                />
               </div>
-            </div>
+
+              <div>
+                <label
+                  htmlFor="message"
+                  className="block font-[family-name:var(--font-mono)] text-xs text-[var(--ink-soft)] tracking-wide mb-2"
+                >
+                  Message
+                </label>
+                <textarea
+                  id="message"
+                  name="message"
+                  value={formData.message}
+                  onChange={handleInputChange}
+                  required
+                  rows={5}
+                  placeholder="What would you like to talk about?"
+                  className="w-full bg-[var(--paper)] border border-[var(--ink)]/30 px-3 py-2 text-[var(--ink)] placeholder-[var(--ink-faint)] focus:outline-none focus:border-[var(--pen)] transition-colors resize-none"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="inline-flex items-center gap-2 bg-[var(--ink)] text-[var(--paper)] px-6 py-3 text-sm font-medium tracking-wide hover:bg-[var(--pen)] transition-colors disabled:opacity-50"
+              >
+                {isSubmitting ? "Opening mail…" : "Send message"}
+                <span aria-hidden>→</span>
+              </button>
+
+              {submitStatus === "success" && (
+                <p className="font-[family-name:var(--font-mono)] text-sm text-[var(--ink-soft)]">
+                  Your mail client should be open. Looking forward to it.
+                </p>
+              )}
+              {submitStatus === "error" && (
+                <p className="font-[family-name:var(--font-mono)] text-sm text-[var(--pen)]">
+                  Something went wrong — email me directly at
+                  toniliang10@gmail.com.
+                </p>
+              )}
+            </form>
+          </div>
+        </section>
+      </main>
+
+      {/* ============================= FOOTER ============================= */}
+      <footer className="border-t border-[var(--ink)]/15 mt-12">
+        <div className="mx-auto max-w-5xl px-6 py-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+          <div className="font-[family-name:var(--font-mono)] text-xs text-[var(--ink-soft)]">
+            <p>
+              <span className="text-[var(--pen)]">T</span>L · Toni Liang
+            </p>
+            <p className="mt-1 text-[var(--ink-faint)]">
+              © 2026 · Built with Next.js
+            </p>
           </div>
 
-          {/* Bottom Bar */}
-          <div className="border-t border-purple-800/50 pt-8 text-center">
-            <p className="text-gray-400">
-              © 2025 Toni Liang. All rights reserved. Built with Next.js and Tailwind CSS.
-            </p>
+          <div className="flex items-center gap-5">
+            {[
+              {
+                href: "https://www.linkedin.com/in/toniliang10/",
+                label: "LinkedIn",
+              },
+              { href: "https://github.com/toniliang-10", label: "GitHub" },
+              {
+                href: "https://docs.google.com/document/d/1GC-fDsrP04xF3k2AfkhoGCNi7lA_be8rU3WhK-X9JoA/edit?tab=t.0",
+                label: "Résumé",
+              },
+              {
+                href: "https://www.instagram.com/toni.liang_/",
+                label: "Instagram",
+              },
+            ].map((link) => (
+              <a
+                key={link.label}
+                href={link.href}
+                target="_blank"
+                rel="noreferrer"
+                className="font-[family-name:var(--font-mono)] text-sm text-[var(--ink-soft)] hover:text-[var(--pen)] transition-colors"
+              >
+                {link.label} ↗
+              </a>
+            ))}
           </div>
         </div>
       </footer>

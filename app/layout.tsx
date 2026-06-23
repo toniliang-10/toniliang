@@ -1,20 +1,29 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Space_Grotesk, IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-space-grotesk",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const plexSans = IBM_Plex_Sans({
+  variable: "--font-plex-sans",
   subsets: ["latin"],
+  weight: ["400", "500", "600"],
+});
+
+const plexMono = IBM_Plex_Mono({
+  variable: "--font-plex-mono",
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
 });
 
 export const metadata: Metadata = {
-  title: "Toni Liang - Portfolio",
-  description: "Senior at Stony Brook University | Building with Care and Passion",
+  title: "Toni Liang — Computer Science ∩ Applied Mathematics",
+  description:
+    "Toni Liang — Stony Brook graduate and incoming Georgia Tech M.S. student. Backend engineering, machine learning, and teaching at the intersection of CS and mathematics.",
 };
 
 export default function RootLayout({
@@ -25,7 +34,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${spaceGrotesk.variable} ${plexSans.variable} ${plexMono.variable} antialiased`}
       >
         {children}
       </body>
