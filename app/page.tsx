@@ -324,7 +324,7 @@ export default function Home() {
                 </a>
                 <span className="relative inline-block">
                   <a
-                    href="https://docs.google.com/document/d/1GC-fDsrP04xF3k2AfkhoGCNi7lA_be8rU3WhK-X9JoA/edit?tab=t.0"
+                    href="https://drive.google.com/file/d/1ZTjswVwLrW0z8YmqFK2xj1S09CZREVZv/view?usp=sharing"
                     target="_blank"
                     rel="noreferrer"
                     className="font-[family-name:var(--font-mono)] text-sm text-[var(--ink-soft)] hover:text-[var(--ink)] px-1"
@@ -729,7 +729,7 @@ export default function Home() {
               },
               { href: "https://github.com/toniliang-10", label: "GitHub" },
               {
-                href: "https://docs.google.com/document/d/1GC-fDsrP04xF3k2AfkhoGCNi7lA_be8rU3WhK-X9JoA/edit?tab=t.0",
+                href: "https://drive.google.com/file/d/1ZTjswVwLrW0z8YmqFK2xj1S09CZREVZv/view?usp=sharing",
                 label: "Résumé",
               },
               {
